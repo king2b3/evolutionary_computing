@@ -1,17 +1,11 @@
 class Selection(abc.ABC):
-    def __init__(
-        self
-    ) -> None:
+    def __init__(self) -> None:
 
     @abstractmethod
-    def returnSelection(
-        self
-    ) -> None:
+    def returnSelection(self, pop) -> list:
         pass
 
 class RouletteWheelSelection(Selection):
 
-    def returnSelection(
-        self
-    ) -> float:
+    def returnSelection(self, pop) -> list:
         None

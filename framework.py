@@ -10,28 +10,16 @@ import abc
 
 
 class CGA(object):
-    def __init__(
-        self
-    ) -> None:
+    def __init__(self) -> None:
         None
     
-    def createNewPopulation(
-        self
-    ) -> None:
+    def createNewPopulation(self) -> None:
 
-    def createIndividual(
-        self
-    ) -> list:
+    def createIndividual(self) -> list:
     
-    def rouletteWheelSelection(
-        self
-    ) -> None:
+    def rouletteWheelSelection(self) -> None:
 
-    def singlePointCrossover(
-        self
-    ) -> None:
+    def singlePointCrossover(self) -> None:
 
     def 
 
-class Fitness(abc.ABC):
-    pass
