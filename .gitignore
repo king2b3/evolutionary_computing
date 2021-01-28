@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+homework_files/
+test.py
 
 # C extensions
 *.so
