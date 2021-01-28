@@ -31,40 +31,42 @@ def parse_arguments(args=None) -> None:
     args = parser.parse_args(args=args)
     return args
 
-def main(input_file, quiet=False, output_file='output', Print=False, name=False) -> None:
+def main(population_size, individual_size, individual_split, fitness, cross_over_rate
+                mutation_rate, selection, k) -> None:
     '''Main function.
-
-    FIX THIS FUNCTION
 
     Parameters
     ----------
-    input_file: str:
-        Path the input file.
-    output_file: str
-        Path to the output file. Default is 'output'
-    quiet: bool
-        Rather non-errors should be printed. Default is False
+    population_size: int:
+        Size of the initial population.
+    individual_size: int:
+        Size of the genome of the individual.
+    individual_split: int:
+        Number of variables in the individual genome.
+    fitness: str:
+        The fitness function we are testing.
+    cross_over_rate: float:
+        The rate of crossover.
+    mutation_rate: float:
+        The rate of mutation.
+    selection: str:
+        The selection type.
+    k: int:
+        The number of crossover points
+
     Returns
     -------
-    int
-        The exit code.
+        None
     Raises
     ------
-    FileNotFoundError
-        Means that the input file was not found.
+        None yet, if incorrect args are used eventually
     '''
     from timer import Timer
 
     compiler_timer = Timer()
     
-    # Error check if the file even exists
-    if not os.path.isfile(input_file):
-        raise FileNotFoundError('File not found: {}'.format(input_file))
+    # Error check if the args are valid. I think choice=[,,,...] is a thing in the arg library
     
-    if name:
-        print('#######################')
-        print(input_file)
-        print('#######################')
     c = Compiler(input_file)
     s = Scanner(input_file,Print)
     compiler_timer.start_timer()
