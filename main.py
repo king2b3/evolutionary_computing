@@ -12,28 +12,28 @@ def parse_arguments(args=None) -> None:
     '''
     parser = argparse.ArgumentParser(description='General genetic framework',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('population_size', 
+    parser.add_argument('population_size', type=int,
             help='Initial size of the population.')
-    parser.add_argument('individual_size', 
+    parser.add_argument('individual_size', type=int,
             help='Size of the genome of each individual.')
-    parser.add_argument('individual_split', 
+    parser.add_argument('individual_split', type=int,
             help='Number of variables in the individual genome.')
-    parser.add_argument('fitness', 
+    parser.add_argument('-f','--fit', type=str, default="max_ones",
             help='Pick the fitness function type. Options: rosenbrock, max_ones')
-    parser.add_argument('-mg','--max_gens', default=2000,
+    parser.add_argument('-mg','--max_gens', default=2000, type=int,
             help='Maximum number of generations allowed')
-    parser.add_argument('-cr','--cross_over_rate', default=0.5,
+    parser.add_argument('-cr','--cross_over_rate', default=0.5, type=float,
             help='Crossover rate. Options in range [0,1]')
-    parser.add_argument('-mr','--mutation_rate', default=0.001,
+    parser.add_argument('-mr','--mutation_rate', default=0.001, type=float,
             help='Mutation rate. Options in range [0,1]')
     parser.add_argument('-s','--selection', default='roulette',
             help='The type of selection function used. Options: random, roulette.')
-    parser.add_argument('-k', default=1, 
+    parser.add_argument('-k', default=1, type=int,
             help='K-point crossover. Options in range [1:Genome Size - 1]')
     args = parser.parse_args(args=args)
     return args
 
-def main(population_size, individual_size, individual_split, fitness, cross_over_rate
+def main(population_size, individual_size, individual_split, fit, cross_over_rate,
                 mutation_rate, selection, k, max_gens) -> None:
     '''Main function.
 
@@ -69,42 +69,62 @@ def main(population_size, individual_size, individual_split, fitness, cross_over
     from timer import Timer
     from fitness import MaxOnes
     from selection import RouletteWheelSelection 
-    from population import CGA 
+    from population import Population 
+    from tabulate import tabulate
+    from individual import Individual
+    from os import system
+    import random
+    random.seed()
     
+    def clear():
+        _ = system("clear")
     
     f = MaxOnes()
     s = RouletteWheelSelection()
-    p = CGA(population_size, individual_size, individual_split, cross_over_rate)
+    p = Population(population_size, individual_size, individual_split)
+    
+    for ind in p.pop:
+        ind.fit = f.returnFitness(ind)
 
-    print(fitness, population_size, individual_size)
-    gens = 0
-    while gen < max_gens or f.checkTerminate(p.pop):
-        for ind in p.pop:
-            ind.fit = f.returnFitness(ind)
-        
-        p.pop = s.returnSelection(p.pop)
+
+    print_headers_list = [['Gen #', ' Max Fitness','Avg Fitness', '% Same']]
+    gen = 0
+    clear()
+    
+    print_list = [['Fitness type','Population Size','Individual Size','Mutation Rate',
+                    'Crossover Rate'],
+                [fit, population_size, individual_size, mutation_rate, cross_over_rate]]
+    print(tabulate(print_list))
+    print('##############################################################')
+    print('Generation','\t','Max Fit','\t','Average Fit','\t','% same','\t',)
+    while gen < max_gens and not f.checkTerminate(p):
 
         for ind in p.pop:
-            ind.mutate(mutation_rate, mutation_rate)
+            ind.mutate(mutation_rate)
+
+        p.pop = s.returnSelection(p)
         
         child_pop = []
-        i = 0
-        while len(child_pop) < p.pop_size:
+        for ind in p.pop:
             r = random.random()
             if r <= cross_over_rate:
                 ind2 = random.choice(p.pop)
-                ind1, ind2 = pop[i].singlePointCrossover(ind2)
+                ind1, ind2 = ind.singlePointCrossover(ind2)
                 child_pop.append(ind1)
                 child_pop.append(ind2)
             else:
-                child_pop.append(pop[i])
+                child_pop.append(ind.val)
+
+        random.shuffle(child_pop)
+        i = 0
+        for ind in p.pop:
+            ind.val = child_pop[i]
+            ind.fit = f.returnFitness(ind)
+            #print(ind.fit,ind.val)
             i += 1
-            if i >= p.pop_size:
-                i = 0
-                random.shuffle(p.pop)
-        p.pop = child_pop.copy()
         gen += 1
-        print(gen,max(p.pop, key=lambda i: i.fit), )
+        m, a, per = p.popStats()
+        print(gen,'\t\t',m,'\t',a,'\t',per,'\t',)
     return None
 
 

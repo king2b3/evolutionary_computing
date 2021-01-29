@@ -4,6 +4,7 @@
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
 '''
+import abc
 import random
 random.seed()
 
@@ -13,7 +14,7 @@ class Selection(abc.ABC):
         '''
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def returnSelection(self, pop) -> list:
         ''' Returns the parent population
         '''
@@ -36,19 +37,23 @@ class RouletteWheelSelection(Selection):
           C      5         .5         [.5, 1.]
     '''
 
-    def returnSelection(self, pop) -> list:
-        s = sum(i.fit for i in pop)
-        pop = sorted(pop, key=lambda i: i.fit)
-        for i in range(len(pop)):
-            if i == 0:
-                pop[i].fit_score = pop[i].fit / s
-            else:
-                pop[i].fit_score = pop[i].fit_score+ pop[i].fit / s
-        parent_pop = []
-        for _ in range(len(pop)):
-            r = random.random()
-            i = 0
-            while r < pop[i].fit_score:
-                i += 1
-            parent_pop.append(pop[i])
+    def returnSelection(self, p) -> list:
+        s = sum(i.fit for i in p.pop)
+        if s == 0: # case when the population is all individuals of all 0s
+            parent_pop = []
+            for _ in range(p.pop_size):
+                parent_pop.append(random.choice(p.pop))
+        else: 
+            for i in range(p.pop_size):
+                if i == 0:
+                    p.pop[i].fit_score = p.pop[i].fit / s
+                else:
+                    p.pop[i].fit_score = p.pop[i-1].fit_score + (p.pop[i].fit / s)
+            parent_pop = []
+            for n in range(p.pop_size):
+                r = random.random()
+                i = 0
+                while r >= p.pop[i].fit_score:
+                    i += 1
+                parent_pop.append(p.pop[i])
         return parent_pop

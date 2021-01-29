@@ -48,9 +48,9 @@ class BitString(Individual):
         self.num_of_variables = num_of_variables
         super().__init__()
         if val:
-            self.generate()
-        else:
             self.val = val
+        else:
+            self.generate()
 
     def generate(self) -> None:
         self.val = random.choices([0,1],k=self.size)
@@ -61,18 +61,20 @@ class BitString(Individual):
             location = random.randint(0,self.size-1) 
             self.val[location] = 1 - self.val[location]
 
-    def singlePointCrossover(self, ind2, ind1=self.val.copy()) -> list:
-        loc = random.randint(0,len(self.val)-1)
+    def singlePointCrossover(self, ind2) -> list:
+        loc = random.randint(1,len(self.val)-2)
+        ind1 = self.val.copy()
         temp1 = self.val.copy()
-        temp2 = ind2.copy()
+        temp2 = ind2.val.copy()
         ind1 = temp1[:loc] + temp2[loc:]
-        ind2 = temp2[:loc] + temp1[:loc]
+        ind2 = temp2[:loc] + temp1[loc:]
+
         return ind1, ind2
     
 def main():
     b = BitString(16,2)
     for _ in range(10):
-        b.mutate()
+        b.mutate(.7)
         print(b.val)
 
 if __name__ == "__main__":
