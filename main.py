@@ -20,6 +20,8 @@ def parse_arguments(args=None) -> None:
             help='Number of variables in the individual genome.')
     parser.add_argument('fitness', 
             help='Pick the fitness function type. Options: rosenbrock, max_ones')
+    parser.add_argument('-mg','--max_gens', default=2000,
+            help='Maximum number of generations allowed')
     parser.add_argument('-cr','--cross_over_rate', default=0.5,
             help='Crossover rate. Options in range [0,1]')
     parser.add_argument('-mr','--mutation_rate', default=0.001,
@@ -32,7 +34,7 @@ def parse_arguments(args=None) -> None:
     return args
 
 def main(population_size, individual_size, individual_split, fitness, cross_over_rate
-                mutation_rate, selection, k) -> None:
+                mutation_rate, selection, k, max_gens) -> None:
     '''Main function.
 
     Parameters
@@ -45,6 +47,8 @@ def main(population_size, individual_size, individual_split, fitness, cross_over
         Number of variables in the individual genome.
     fitness: str:
         The fitness function we are testing.
+    max_gens: int:
+        Maximum number of generations allowed during the evolutionary process.
     cross_over_rate: float:
         The rate of crossover.
     mutation_rate: float:
@@ -57,24 +61,52 @@ def main(population_size, individual_size, individual_split, fitness, cross_over
     Returns
     -------
         None
+    
     Raises
     ------
         None yet, if incorrect args are used eventually
     '''
     from timer import Timer
-
-    compiler_timer = Timer()
+    from fitness import MaxOnes
+    from selection import RouletteWheelSelection 
+    from population import CGA 
     
-    # Error check if the args are valid. I think choice=[,,,...] is a thing in the arg library
     
-    c = Compiler(input_file)
-    s = Scanner(input_file,Print)
-    compiler_timer.start_timer()
-    s.scanFile()
-    compiler_timer.end_timer()
-    print(compiler_timer.__str__())
+    f = MaxOnes()
+    s = RouletteWheelSelection()
+    p = CGA(population_size, individual_size, individual_split, cross_over_rate)
 
+    print(fitness, population_size, individual_size)
+    gens = 0
+    while gen < max_gens or f.checkTerminate(p.pop):
+        for ind in p.pop:
+            ind.fit = f.returnFitness(ind)
+        
+        p.pop = s.returnSelection(p.pop)
+
+        for ind in p.pop:
+            ind.mutate(mutation_rate, mutation_rate)
+        
+        child_pop = []
+        i = 0
+        while len(child_pop) < p.pop_size:
+            r = random.random()
+            if r <= cross_over_rate:
+                ind2 = random.choice(p.pop)
+                ind1, ind2 = pop[i].singlePointCrossover(ind2)
+                child_pop.append(ind1)
+                child_pop.append(ind2)
+            else:
+                child_pop.append(pop[i])
+            i += 1
+            if i >= p.pop_size:
+                i = 0
+                random.shuffle(p.pop)
+        p.pop = child_pop.copy()
+        gen += 1
+        print(gen,max(p.pop, key=lambda i: i.fit), )
     return None
+
 
 
 # Execute only if this file is being run as the entry file.
