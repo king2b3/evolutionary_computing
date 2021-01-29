@@ -97,13 +97,35 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     print(tabulate(print_list))
     print('##############################################################')
     print('Generation','\t','Max Fit','\t','Average Fit','\t','% same','\t',)
+    
     while gen < max_gens and not f.checkTerminate(p):
+        '''print('##################')
+        print('Initial Population')
+        for ind in p.pop:
+            print(ind.val)
+        print('##################')
+        '''
+        # Selection
+        p.pop = s.returnSelection(p)
 
+        '''print('##################')
+        print('After Selection')
+        for ind in p.pop:
+            print(ind.val)
+        print('##################')
+        '''
+        # Mutation
         for ind in p.pop:
             ind.mutate(mutation_rate)
-
-        p.pop = s.returnSelection(p)
         
+        '''print('##################')
+        print('After Mutation')
+        for ind in p.pop:
+            print(ind.val)
+        print('##################')
+        '''
+        
+        # Crossover
         child_pop = []
         for ind in p.pop:
             r = random.random()
@@ -111,20 +133,27 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
                 ind2 = random.choice(p.pop)
                 ind1, ind2 = ind.singlePointCrossover(ind2)
                 child_pop.append(ind1)
-                child_pop.append(ind2)
+                #child_pop.append(ind2)
             else:
                 child_pop.append(ind.val)
-
-        random.shuffle(child_pop)
+        #random.shuffle(child_pop)
         i = 0
         for ind in p.pop:
             ind.val = child_pop[i]
             ind.fit = f.returnFitness(ind)
-            #print(ind.fit,ind.val)
             i += 1
+        
+        '''print('##################')
+        print('After Crossover')
+        for ind in p.pop:
+            print(ind.val)
+        print('##################')
+        '''       
         gen += 1
         m, a, per = p.popStats()
         print(gen,'\t\t',m,'\t',a,'\t',per,'\t',)
+    for i in p.pop:
+        print(i.val)
     return None
 
 

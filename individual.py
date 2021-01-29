@@ -56,13 +56,13 @@ class BitString(Individual):
         self.val = random.choices([0,1],k=self.size)
     
     def mutate(self, mut_rate) -> None:
-        r = random.random()
-        if r <= mut_rate:
-            location = random.randint(0,self.size-1) 
-            self.val[location] = 1 - self.val[location]
+        for location in range(self.size):
+            r = random.random()
+            if r <= mut_rate:
+                self.val[location] = 1 - self.val[location]
 
     def singlePointCrossover(self, ind2) -> list:
-        loc = random.randint(1,len(self.val)-2)
+        loc = random.randint(1,self.size-2)
         ind1 = self.val.copy()
         temp1 = self.val.copy()
         temp2 = ind2.val.copy()
@@ -73,8 +73,8 @@ class BitString(Individual):
     
 def main():
     b = BitString(16,2)
-    for _ in range(10):
-        b.mutate(.7)
+    for _ in range(100):
+        b.mutate(.1)
         print(b.val)
 
 if __name__ == "__main__":

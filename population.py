@@ -33,10 +33,12 @@ class Population(object):
         return total_fit / self.pop_size
     
     def getNumSame(self) -> float:
-        count = 0
+        from collections import defaultdict
+        num_stats = defaultdict(lambda: 0)
         for ind in self.pop:
-            if [1]*self.ind_size == ind.val:
-                count += 1
+            num_stats[str(ind.val)] += 1
+        return sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+            
         return count / self.pop_size    
     
     def popStats(self) -> list:
