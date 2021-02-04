@@ -67,11 +67,11 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         None yet, if incorrect args are used eventually
     '''
     from timer import Timer
-    from fitness import MaxOnes
-    from selection import RouletteWheelSelection 
-    from population import Population 
+    from fitness import RosenbrockFixed as fitness
+    from selection import RouletteWheelSelection as selection
+    from population import Population as population 
     from tabulate import tabulate
-    from individual import Individual
+    #from individual import Individual as individual
     from os import system
     import random
     random.seed()
@@ -79,9 +79,9 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     def clear():
         _ = system("clear")
     
-    f = MaxOnes()
-    s = RouletteWheelSelection()
-    p = Population(population_size, individual_size, individual_split)
+    f = fitness()
+    s = selection()
+    p = population(population_size, individual_size, individual_split)
     
     for ind in p.pop:
         ind.fit = f.returnFitness(ind)

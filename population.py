@@ -37,7 +37,7 @@ class Population(object):
         num_stats = defaultdict(lambda: 0)
         for ind in self.pop:
             num_stats[str(ind.val)] += 1
-        return sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
             
         return count / self.pop_size    
     

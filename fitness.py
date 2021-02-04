@@ -47,10 +47,74 @@ class MaxOnes(Fitness):
         return count == p.pop_size
         #return pop.count(random.choices([1],k=len(pop[0]))) == len(pop)
 
-class Rosenbrock(Fitness):
+class RosenbrockIEEE(Fitness):
+    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
 
-    def returnFitness(self, individual) -> float:
-        pass
-    
-    def checkTerminate(self, pop) -> bool:
-        pass
+        First half of the individual is x, second half is y
+        IEEE 745. 32 bits for each number. Individual is 64 bits long
+    '''
+
+    def translate(self, n) -> float:
+        ''' Returns the float value from IEEE 745
+        '''
+        if n[0]:
+            sign = -1
+        else:
+            sign = 1
+        exponent = n[1:9]
+        mantissa = n[9:]
+
+        exponent = int(bin(int(''.join(map(str, exponent)), 2)), 2)
+        new_mantissa = 1
+        temp = 0.5
+        for m in mantissa:
+            if m:
+                new_mantissa += temp
+            temp = temp / 2
+        return (sign) * (new_mantissa) * 2**(exponent-127)
+
+    def returnFitness(self, individual, a=1, b=100) -> float:
+        x = self.translate(individual.val[:32])
+        y = self.translate(individual.val[32:])
+        return (a-x)**2 + b*(y-x**2)
+
+    def checkTerminate(self, p) -> bool:
+        return 0 == min(i.fit for i in p.pop)
+
+
+class RosenbrockFixed(Fitness):
+    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
+
+        First half of the individual is x, second half is y.
+        
+        Option 2:
+            For an individual sized N, a fixed point splits is like this
+              X = S(N/4,N/4)
+    '''
+    def translate(self, n, split=4) -> float:
+        ''' Returns the float value from IEEE 745
+        '''
+        
+        if n[0]:
+            sign = -1
+        else:
+            sign = 1
+        left = n[1:split]
+        right = n[split:]
+
+        left = int(bin(int(''.join(map(str, left)), 2)), 2)
+        new_right = 0
+        temp = 0.5
+        for m in right:
+            if m:
+                new_right += temp
+            temp = temp / 2
+        return (sign) * (left + new_right)
+
+    def returnFitness(self, individual, a=1, b=100) -> float:
+        x = self.translate(individual.val[:5])
+        y = self.translate(individual.val[5:])
+        return abs((a-x)**2 + b*(y-x**2))
+
+    def checkTerminate(self, p) -> bool:
+        return 0 == min(i.fit for i in p.pop)
