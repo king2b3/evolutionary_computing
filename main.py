@@ -16,7 +16,7 @@ def parse_arguments(args=None) -> None:
             help='Initial size of the population.')
     parser.add_argument('individual_size', type=int,
             help='Size of the genome of each individual.')
-    parser.add_argument('individual_split', type=int,
+    parser.add_argument('-is','--individual_split', type=int, default=1,
             help='Number of variables in the individual genome.')
     parser.add_argument('-f','--fit', type=str, default="max_ones",
             help='Pick the fitness function type. Options: rosenbrock, max_ones')
@@ -59,7 +59,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         The number of crossover points
 
     Returns
-    -------
+    ------- 
         None
     
     Raises
@@ -67,7 +67,10 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         None yet, if incorrect args are used eventually
     '''
     from timer import Timer
-    from fitness import RosenbrockFixed as fitness
+    if fit == 'rosenbrock':
+        from fitness import RosenbrockFixed as fitness
+    else:
+        from fitness import MaxOnes as fitness
     from selection import RouletteWheelSelection as selection
     from population import Population as population 
     from tabulate import tabulate
@@ -75,6 +78,9 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     from os import system
     import random
     random.seed()
+    
+    if individual_split > 1:
+        individual_split = int(individual_size/individual_split)
     
     def clear():
         _ = system("clear")
@@ -151,12 +157,10 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         '''       
         gen += 1
         m, a, per = p.popStats()
-        print(gen,'\t\t',m,'\t',a,'\t',per,'\t',)
-    for i in p.pop:
-        print(i.val)
+        print(gen,'\t\t',m,'\t',a,'\t',per,'%')
+    #for i in p.pop:
+    #    print(i.val)
     return None
-
-
 
 # Execute only if this file is being run as the entry file.
 if __name__ == "__main__":

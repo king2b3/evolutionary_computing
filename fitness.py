@@ -7,6 +7,7 @@
     Created by: Bayley King (https://github.com/king2b3)
 '''
 import abc
+import math
 class Fitness(abc.ABC):
     def __init__(self) -> None:
         ''' Abstract class that contains a fitness function
@@ -76,7 +77,7 @@ class RosenbrockIEEE(Fitness):
     def returnFitness(self, individual, a=1, b=100) -> float:
         x = self.translate(individual.val[:32])
         y = self.translate(individual.val[32:])
-        return (a-x)**2 + b*(y-x**2)
+        return abs((a-x)**2 + b*(y-x**2))
 
     def checkTerminate(self, p) -> bool:
         return 0 == min(i.fit for i in p.pop)
@@ -91,10 +92,15 @@ class RosenbrockFixed(Fitness):
             For an individual sized N, a fixed point splits is like this
               X = S(N/4,N/4)
     '''
-    def translate(self, n, split=4) -> float:
+    def translate(self, n, split=0) -> float:
         ''' Returns the float value from IEEE 745
         '''
-        
+        if split != 0:
+            pass
+        else:
+            split = math.ceil(len(n)/2) - 1
+
+        #print(split)
         if n[0]:
             sign = -1
         else:
@@ -112,8 +118,8 @@ class RosenbrockFixed(Fitness):
         return (sign) * (left + new_right)
 
     def returnFitness(self, individual, a=1, b=100) -> float:
-        x = self.translate(individual.val[:5])
-        y = self.translate(individual.val[5:])
+        x = self.translate(individual.val[:individual.num_of_variables])
+        y = self.translate(individual.val[individual.num_of_variables:])
         return abs((a-x)**2 + b*(y-x**2))
 
     def checkTerminate(self, p) -> bool:
