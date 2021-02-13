@@ -63,18 +63,23 @@ class BitString(Individual):
 
     def singlePointCrossover(self, ind2) -> list:
         loc = random.randint(1,self.size-2)
+        #print(loc)
         ind1 = self.val.copy()
         temp1 = self.val.copy()
         temp2 = ind2.val.copy()
         ind1 = temp1[:loc] + temp2[loc:]
-        ind2 = temp2[:loc] + temp1[loc:]
+        #ind2 = temp2[:loc] + temp1[loc:]
 
-        return ind1, ind2
+        return ind1
+        #return ind1, ind2
     
 def main():
-    b = BitString(16,2)
-    for _ in range(100):
-        b.mutate(.1)
+    b = BitString(10,2)
+    c = BitString(10,2)
+    print(b.val)
+    print(c.val)
+    for _ in range(1):
+        b.val = b.singlePointCrossover(c)
         print(b.val)
 
 if __name__ == "__main__":

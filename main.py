@@ -69,8 +69,16 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     from timer import Timer
     if fit == 'rosenbrock':
         from fitness import RosenbrockFixed as fitness
+        maxFit = False
+        best_m = 999999
+        best_a = 999999
+        best_per = 999999
     else:
         from fitness import MaxOnes as fitness
+        maxFit = True
+        best_m = 0
+        best_a = 0
+        best_per = 0
     from selection import RouletteWheelSelection as selection
     from population import Population as population 
     from tabulate import tabulate
@@ -106,7 +114,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     
     print('##############################################################')
     print('Generation','\t','Max Fit','\t','Average Fit','\t','% same','\t',)
-    
+
     while gen < max_gens and not f.checkTerminate(p):
         '''print('##################')
         print('Initial Population')
@@ -136,15 +144,18 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         
         # Crossover
         child_pop = []
+        parent_pop = p.pop.copy()
         for ind in p.pop:
             r = random.random()
             if r <= cross_over_rate:
-                ind2 = random.choice(p.pop)
-                ind1, ind2 = ind.singlePointCrossover(ind2)
-                child_pop.append(random.choice([ind1,ind2]))
-            else:
-                child_pop.append(ind.val)
-        #random.shuffle(child_pop)
+                ind2 = random.choice(parent_pop)
+                ind.val = ind.singlePointCrossover(ind2)
+                
+                #ind1, ind2 = ind.singlePointCrossover(ind2)
+                #child_pop.append(random.choice([ind1,ind2]))
+            #else:
+            #    child_pop.append(ind.val)
+        random.shuffle(p.pop)
         
         '''
         print('##################')
@@ -154,17 +165,28 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         print('##################')
         '''
             
-        i = 0
+        #i = 0
         for ind in p.pop:
-            ind.val = child_pop[i]
+            #ind.val = child_pop[i]
             ind.fit = f.returnFitness(ind)
-            i += 1
+            #i += 1
 
         gen += 1
         m, a, per = p.popStats()
+        if maxFit:
+            if best_m < float(m) : best_m = float(m)
+            #if best_a < a : best_a = a
+            #if best_per < per : best_per = per
+        else:
+            if best_m > float(m) : best_m = float(m)
+            #if best_a < a : best_a = a
+            #if best_per < per : best_per = per
+
         print(gen,'\t\t',m,'\t',a,'\t',per,'%')
     #for i in p.pop:
     #    print(i.val)
+    if gen == max_gens:
+        print(f"Best fit {best_m}")
     return None
 
 # Execute only if this file is being run as the entry file.
