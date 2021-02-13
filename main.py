@@ -78,29 +78,32 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     from os import system
     import random
     random.seed()
-    
-    if individual_split > 1:
-        individual_split = int(individual_size/individual_split)
-    
+
     def clear():
         _ = system("clear")
     
-    f = fitness()
-    s = selection()
-    p = population(population_size, individual_size, individual_split)
-    
-    for ind in p.pop:
-        ind.fit = f.returnFitness(ind)
+    clear()    
 
-
-    print_headers_list = [['Gen #', ' Max Fitness','Avg Fitness', '% Same']]
-    gen = 0
-    clear()
+    if individual_split > 1:
+        individual_split = int(individual_size/individual_split)
+    #print(individual_split)
     
     print_list = [['Fitness type','Population Size','Individual Size','Mutation Rate',
                     'Crossover Rate'],
                 [fit, population_size, individual_size, mutation_rate, cross_over_rate]]
     print(tabulate(print_list))
+    f = fitness()
+    s = selection()
+    p = population(population_size, individual_size, individual_split)
+    
+    for ind in p.pop:
+        #print(ind.val)
+        ind.fit = f.returnFitness(ind)
+
+
+    #print_headers_list = [['Gen #', ' Max Fitness','Avg Fitness', '% Same']]
+    gen = 0
+    
     print('##############################################################')
     print('Generation','\t','Max Fit','\t','Average Fit','\t','% same','\t',)
     
@@ -138,23 +141,25 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
             if r <= cross_over_rate:
                 ind2 = random.choice(p.pop)
                 ind1, ind2 = ind.singlePointCrossover(ind2)
-                child_pop.append(ind1)
-                #child_pop.append(ind2)
+                child_pop.append(random.choice([ind1,ind2]))
             else:
                 child_pop.append(ind.val)
         #random.shuffle(child_pop)
+        
+        '''
+        print('##################')
+        print('After Crossover')
+        for ind in p.pop:
+            print(ind.val)
+        print('##################')
+        '''
+            
         i = 0
         for ind in p.pop:
             ind.val = child_pop[i]
             ind.fit = f.returnFitness(ind)
             i += 1
-        
-        '''print('##################')
-        print('After Crossover')
-        for ind in p.pop:
-            print(ind.val)
-        print('##################')
-        '''       
+
         gen += 1
         m, a, per = p.popStats()
         print(gen,'\t\t',m,'\t',a,'\t',per,'%')

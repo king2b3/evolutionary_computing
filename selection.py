@@ -39,6 +39,7 @@ class RouletteWheelSelection(Selection):
 
     def returnSelection(self, p) -> list:
         s = sum(i.fit for i in p.pop)
+        p.pop = sorted((ind for ind in p.pop), key=lambda ind: ind.fit)
         if s == 0: # case when the population is all individuals of all 0s
             parent_pop = []
             for _ in range(p.pop_size):
@@ -78,6 +79,7 @@ class RouletteWheelSelectionMin(Selection):
 
     def returnSelection(self, p) -> list:
         s = sum(i.fit for i in p.pop)
+        p.pop = sorted((ind for ind in p.pop), key=lambda ind: ind.fit)
         if s == 0: # case when the population is all individuals of all 0s
             parent_pop = []
             for _ in range(p.pop_size):

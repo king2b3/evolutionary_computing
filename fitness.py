@@ -77,7 +77,7 @@ class RosenbrockIEEE(Fitness):
     def returnFitness(self, individual, a=1, b=100) -> float:
         x = self.translate(individual.val[:32])
         y = self.translate(individual.val[32:])
-        return abs((a-x)**2 + b*(y-x**2))
+        return abs((a-x)**2 + b*(y-x**2)**2)
 
     def checkTerminate(self, p) -> bool:
         return 0 == min(i.fit for i in p.pop)
@@ -108,6 +108,7 @@ class RosenbrockFixed(Fitness):
         left = n[1:split]
         right = n[split:]
 
+        #print(split,n)
         left = int(bin(int(''.join(map(str, left)), 2)), 2)
         new_right = 0
         temp = 0.5
@@ -120,7 +121,7 @@ class RosenbrockFixed(Fitness):
     def returnFitness(self, individual, a=1, b=100) -> float:
         x = self.translate(individual.val[:individual.num_of_variables])
         y = self.translate(individual.val[individual.num_of_variables:])
-        return abs((a-x)**2 + b*(y-x**2))
+        return abs((a-x)**2 + b*(y-x**2)**2)
 
     def checkTerminate(self, p) -> bool:
         return 0 == min(i.fit for i in p.pop)
