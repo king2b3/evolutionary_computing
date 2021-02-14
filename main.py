@@ -26,15 +26,15 @@ def parse_arguments(args=None) -> None:
             help='Crossover rate. Options in range [0,1]')
     parser.add_argument('-mr','--mutation_rate', default=0.001, type=float,
             help='Mutation rate. Options in range [0,1]')
-    parser.add_argument('-s','--selection', default='roulette',
-            help='The type of selection function used. Options: random, roulette.')
+    parser.add_argument('-s','--selection_type', default='roulette',
+            help='The type of selection function used. Options: random, roulette, tournament.')
     parser.add_argument('-k', default=1, type=int,
             help='K-point crossover. Options in range [1:Genome Size - 1]')
     args = parser.parse_args(args=args)
     return args
 
 def main(population_size, individual_size, individual_split, fit, cross_over_rate,
-                mutation_rate, selection, k, max_gens) -> None:
+                mutation_rate, k, max_gens, selection_type) -> None:
     '''Main function.
 
     Parameters
@@ -53,7 +53,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         The rate of crossover.
     mutation_rate: float:
         The rate of mutation.
-    selection: str:
+    selection_type: str:
         The selection type.
     k: int:
         The number of crossover points
@@ -79,10 +79,14 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         best_m = 0
         best_a = 0
         best_per = 0
-    from selection import RouletteWheelSelection as selection
+    if selection_type == 'random':
+        from selection import Random as selection
+    elif selection_type == 'tournament':
+        from selection import Tournament as selection
+    else:
+        from selection import RouletteWheelSelection as selection
     from population import Population as population 
     from tabulate import tabulate
-    #from individual import Individual as individual
     from os import system
     import random
     random.seed()

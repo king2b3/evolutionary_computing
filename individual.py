@@ -46,6 +46,7 @@ class BitString(Individual):
     def __init__(self, size, num_of_variables, val=None) -> None:
         self.size = size
         self.num_of_variables = num_of_variables
+        # inits class with parent methods and variables
         super().__init__()
         if val:
             self.val = val
@@ -53,27 +54,29 @@ class BitString(Individual):
             self.generate()
 
     def generate(self) -> None:
+        # sets value as a random list of 0s and 1s to the self.size
         self.val = random.choices([0,1],k=self.size)
     
     def mutate(self, mut_rate) -> None:
+        # bitwise mutation rate
         for location in range(self.size):
             r = random.random()
             if r <= mut_rate:
+                # 1 - 1 = 0 or 1 - 0 = 1. Flips the bits
                 self.val[location] = 1 - self.val[location]
 
     def singlePointCrossover(self, ind2) -> list:
+        # picks random location in the bit string
         loc = random.randint(1,self.size-2)
-        #print(loc)
-        ind1 = self.val.copy()
+        # creates temps of the two individuals
         temp1 = self.val.copy()
         temp2 = ind2.val.copy()
+        # crossover at point loc
         ind1 = temp1[:loc] + temp2[loc:]
-        #ind2 = temp2[:loc] + temp1[loc:]
-
         return ind1
-        #return ind1, ind2
     
 def main():
+    # testing function
     b = BitString(10,2)
     c = BitString(10,2)
     print(b.val)
