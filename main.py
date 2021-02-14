@@ -26,15 +26,15 @@ def parse_arguments(args=None) -> None:
             help='Crossover rate. Options in range [0,1]')
     parser.add_argument('-mr','--mutation_rate', default=0.001, type=float,
             help='Mutation rate. Options in range [0,1]')
-    parser.add_argument('-s','--selection', default='roulette',
-            help='The type of selection function used. Options: random, roulette.')
+    parser.add_argument('-s','--selection_type', default='roulette',
+            help='The type of selection function used. Options: random, roulette, tournament.')
     parser.add_argument('-k', default=1, type=int,
             help='K-point crossover. Options in range [1:Genome Size - 1]')
     args = parser.parse_args(args=args)
     return args
 
 def main(population_size, individual_size, individual_split, fit, cross_over_rate,
-                mutation_rate, selection, k, max_gens) -> None:
+                mutation_rate, k, max_gens, selection_type) -> None:
     '''Main function.
 
     Parameters
@@ -53,7 +53,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         The rate of crossover.
     mutation_rate: float:
         The rate of mutation.
-    selection: str:
+    selection_type: str:
         The selection type.
     k: int:
         The number of crossover points
@@ -69,12 +69,24 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     from timer import Timer
     if fit == 'rosenbrock':
         from fitness import RosenbrockFixed as fitness
+        maxFit = False
+        best_m = 999999
+        best_a = 999999
+        best_per = 999999
     else:
         from fitness import MaxOnes as fitness
-    from selection import RouletteWheelSelection as selection
+        maxFit = True
+        best_m = 0
+        best_a = 0
+        best_per = 0
+    if selection_type == 'random':
+        from selection import Random as selection
+    elif selection_type == 'tournament':
+        from selection import Tournament as selection
+    else:
+        from selection import RouletteWheelSelection as selection
     from population import Population as population 
     from tabulate import tabulate
-    #from individual import Individual as individual
     from os import system
     import random
     random.seed()
@@ -106,7 +118,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     
     print('##############################################################')
     print('Generation','\t','Max Fit','\t','Average Fit','\t','% same','\t',)
-    
+
     while gen < max_gens and not f.checkTerminate(p):
         '''print('##################')
         print('Initial Population')
@@ -136,15 +148,18 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         
         # Crossover
         child_pop = []
+        parent_pop = p.pop.copy()
         for ind in p.pop:
             r = random.random()
             if r <= cross_over_rate:
-                ind2 = random.choice(p.pop)
-                ind1, ind2 = ind.singlePointCrossover(ind2)
-                child_pop.append(random.choice([ind1,ind2]))
-            else:
-                child_pop.append(ind.val)
-        #random.shuffle(child_pop)
+                ind2 = random.choice(parent_pop)
+                ind.val = ind.singlePointCrossover(ind2)
+                
+                #ind1, ind2 = ind.singlePointCrossover(ind2)
+                #child_pop.append(random.choice([ind1,ind2]))
+            #else:
+            #    child_pop.append(ind.val)
+        random.shuffle(p.pop)
         
         '''
         print('##################')
@@ -154,17 +169,28 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         print('##################')
         '''
             
-        i = 0
+        #i = 0
         for ind in p.pop:
-            ind.val = child_pop[i]
+            #ind.val = child_pop[i]
             ind.fit = f.returnFitness(ind)
-            i += 1
+            #i += 1
 
         gen += 1
         m, a, per = p.popStats()
+        if maxFit:
+            if best_m < float(m) : best_m = float(m)
+            #if best_a < a : best_a = a
+            #if best_per < per : best_per = per
+        else:
+            if best_m > float(m) : best_m = float(m)
+            #if best_a < a : best_a = a
+            #if best_per < per : best_per = per
+
         print(gen,'\t\t',m,'\t',a,'\t',per,'%')
     #for i in p.pop:
     #    print(i.val)
+    if gen == max_gens:
+        print(f"Best fit {best_m}")
     return None
 
 # Execute only if this file is being run as the entry file.

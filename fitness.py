@@ -8,6 +8,7 @@
 '''
 import abc
 import math
+
 class Fitness(abc.ABC):
     def __init__(self) -> None:
         ''' Abstract class that contains a fitness function
@@ -26,6 +27,7 @@ class Fitness(abc.ABC):
         '''
         pass
 
+
 class MaxOnes(Fitness):
     ''' Goal is to have the genotype be all 1s
     '''
@@ -33,6 +35,7 @@ class MaxOnes(Fitness):
         ''' Sums the individual since its just a list of 0s and 1s. 
               Divides by the length of the individual.
         '''
+        # sums the list, [1,1,1,1,0,0] would have sum 4 
         return sum(ind.val)/ind.size
 
     def checkTerminate(self, p) -> bool:
@@ -43,10 +46,69 @@ class MaxOnes(Fitness):
         '''
         count = 0
         for ind in p.pop:
+            # [1]*4 would result in [1,1,1,1]
             if [1]*p.ind_size == ind.val:
                 count += 1
+        # if each individual is all 1s
         return count == p.pop_size
-        #return pop.count(random.choices([1],k=len(pop[0]))) == len(pop)
+
+
+class RosenbrockFixed(Fitness):
+    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
+
+        First half of the individual is x, second half is y.
+        
+        For an individual sized N, a fixed point splits is like this
+          X = S(N/4,N/4)
+    '''
+    def translate(self, n, split=0) -> float:
+        ''' Returns the float value from IEEE 745
+        '''
+        if split != 0:
+            pass
+        else:
+            split = math.ceil(len(n)/2) - 1
+
+        # determins the sign of the number
+        if n[0]:
+            sign = -1
+        else:
+            sign = 1
+
+        # splits the list into the left and right sides of the float
+        left = n[1:split]
+        right = n[split:]
+
+        # combines the left hand side into an int
+        left = int(bin(int(''.join(map(str, left)), 2)), 2)
+        
+        # adds the right hand floating value to the left side
+        new_right = 0
+        temp = 0.5
+        for m in right:
+            if m:
+                new_right += temp
+            temp = temp / 2
+        return (sign) * (left + new_right)
+
+    def returnFitness(self, individual, a=1, b=100) -> float:
+        # splits the individual into multiple variables
+        x = self.translate(individual.val[:individual.num_of_variables])
+        y = self.translate(individual.val[individual.num_of_variables:])
+        # returns the rosenbrock value of the two variables
+        return abs((a-x)**2 + b*(y-x**2)**2)
+
+    def checkTerminate(self, p) -> bool:
+        # if the population is all 1,1 IE the fit of each individual is 0
+        return 0 == min(i.fit for i in p.pop)
+
+
+""" DISREGARD. Gave a high a high precision binary floating representation a try
+      and it was NOT a good idea. The range IEEE 745 gave was way too large for
+      this problem scope.
+
+      Leaving the code here as a reference
+"""
 
 class RosenbrockIEEE(Fitness):
     ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
@@ -77,50 +139,6 @@ class RosenbrockIEEE(Fitness):
     def returnFitness(self, individual, a=1, b=100) -> float:
         x = self.translate(individual.val[:32])
         y = self.translate(individual.val[32:])
-        return abs((a-x)**2 + b*(y-x**2)**2)
-
-    def checkTerminate(self, p) -> bool:
-        return 0 == min(i.fit for i in p.pop)
-
-
-class RosenbrockFixed(Fitness):
-    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
-
-        First half of the individual is x, second half is y.
-        
-        Option 2:
-            For an individual sized N, a fixed point splits is like this
-              X = S(N/4,N/4)
-    '''
-    def translate(self, n, split=0) -> float:
-        ''' Returns the float value from IEEE 745
-        '''
-        if split != 0:
-            pass
-        else:
-            split = math.ceil(len(n)/2) - 1
-
-        #print(split)
-        if n[0]:
-            sign = -1
-        else:
-            sign = 1
-        left = n[1:split]
-        right = n[split:]
-
-        #print(split,n)
-        left = int(bin(int(''.join(map(str, left)), 2)), 2)
-        new_right = 0
-        temp = 0.5
-        for m in right:
-            if m:
-                new_right += temp
-            temp = temp / 2
-        return (sign) * (left + new_right)
-
-    def returnFitness(self, individual, a=1, b=100) -> float:
-        x = self.translate(individual.val[:individual.num_of_variables])
-        y = self.translate(individual.val[individual.num_of_variables:])
         return abs((a-x)**2 + b*(y-x**2)**2)
 
     def checkTerminate(self, p) -> bool:
