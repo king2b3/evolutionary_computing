@@ -28,6 +28,38 @@ class Fitness(abc.ABC):
         pass
 
 
+class HimmelblauMax(Fitness):
+    def returnFitness(self, ind) -> float:
+        ''' Returns the fitness of an individual
+        '''
+        return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
+        
+    def checkTerminate(self, p) -> bool:
+        ''' Returns True if the termination conditions are met
+        '''
+        count = 0
+        for ind in p.pop:
+            if ind.fit >= 181.617:
+                count+=1
+        return count == p.pop_size
+
+
+class HimmelblauMin(Fitness):
+    def returnFitness(self, ind) -> float:
+        ''' Returns the fitness of an individual
+        '''
+        return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
+    
+    def checkTerminate(self, p) -> bool:
+        ''' Returns True if the termination conditions are met
+        '''
+        count = 0
+        for ind in p.pop:
+            if ind.fit == 0.0:
+                count+=1
+        return count == p.pop_size
+
+
 class MaxOnes(Fitness):
     ''' Goal is to have the genotype be all 1s
     '''

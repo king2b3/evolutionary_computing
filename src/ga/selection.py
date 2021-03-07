@@ -20,6 +20,17 @@ class Selection(abc.ABC):
         '''
         pass
 
+class UniformRandom(Selection):
+    """Uniform Random Selection for parents
+
+    Each individual has the same chance to be selected
+    """
+    def returnSelection(self, p) -> list:
+        p.parents = []
+        for _ in range(p.mew):
+            p.parents.append(random.choice(p.pop))
+        return p.parents
+
 class RouletteWheelSelection(Selection):
     ''' Roulette Wheel Selection Function
 

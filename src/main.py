@@ -19,7 +19,7 @@ def parse_arguments(args=None) -> None:
     parser.add_argument('-is','--individual_split', type=int, default=1,
             help='Number of variables in the individual genome.')
     parser.add_argument('-f','--fit', type=str, default="max_ones",
-            help='Pick the fitness function type. Options: rosenbrock, max_ones')
+            help='Pick the fitness function type. Options: rosenbrock, max_ones, himmelblau_max, himmelblau_min')
     parser.add_argument('-mg','--max_gens', default=2000, type=int,
             help='Maximum number of generations allowed')
     parser.add_argument('-cr','--cross_over_rate', default=0.5, type=float,
@@ -30,11 +30,13 @@ def parse_arguments(args=None) -> None:
             help='The type of selection function used. Options: random, roulette, tournament.')
     parser.add_argument('-k', default=1, type=int,
             help='K-point crossover. Options in range [1:Genome Size - 1]')
+    parser.add_argument('-p', '--pop', default="fixed", type=str,
+            help='Population type. Options: fixed, mew_lambda')
     args = parser.parse_args(args=args)
     return args
 
 def main(population_size, individual_size, individual_split, fit, cross_over_rate,
-                mutation_rate, k, max_gens, selection_type) -> None:
+                mutation_rate, k, max_gens, selection_type, pop) -> None:
     '''Main function.
 
     Parameters
@@ -65,31 +67,55 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     Raises
     ------
         None yet, if incorrect args are used eventually
-    '''
-    from timer import Timer
+    '''    
+    # imports
+    """class imports based off of arg parsing"""
+    # fitness
     if fit == 'rosenbrock':
-        from fitness import RosenbrockFixed as fitness
+        from ga.fitness import RosenbrockFixed as fitness
         maxFit = False
         best_m = 999999
         best_a = 999999
         best_per = 999999
-    else:
-        from fitness import MaxOnes as fitness
+    elif fit == 'max_ones':
+        from ga.fitness import MaxOnes as fitness
         maxFit = True
         best_m = 0
         best_a = 0
         best_per = 0
+    elif fit == 'himmelblau_max':
+        from ga.fitness import HimmelblauMax as fitness
+        maxFit = True
+        best_m = 0
+        best_a = 0
+        best_per = 0
+    else: #if fit == 'himmelblau_max':
+        from ga.fitness import HimmelblauMin as fitness
+        maxFit = False
+        best_m = 999999
+        best_a = 999999
+        best_per = 999999
+    # selection
     if selection_type == 'random':
-        from selection import Random as selection
+        from ga.selection import Random as selection
     elif selection_type == 'tournament':
-        from selection import Tournament as selection
+        from ga.selection import Tournament as selection
+    elif selection_type == 'uniform':
+        from ga.selection import UniformRandom as selection
     else:
-        from selection import RouletteWheelSelection as selection
-    from population import Population as population 
-    from tabulate import tabulate
-    from os import system
-    import random
-    random.seed()
+        from ga.selection import RouletteWheelSelection as selection
+    # population type
+    if pop == 'fixed':
+        from ga.population import FixedSize as population 
+    else:
+        from ga.population import MewLambda as population
+    # my custom timer class
+    from timer import Timer
+    # Other imports    
+    from tabulate import tabulate   # pretty plotting
+    from os import system           # for clearing the terminal
+    import random                   # random library
+    random.seed()                   # seeding the random num gengerator
 
     def clear():
         _ = system("clear")
@@ -106,7 +132,7 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
     print(tabulate(print_list))
     f = fitness()
     s = selection()
-    p = population(population_size, individual_size, individual_split)
+    p = population(population_size)
     
     for ind in p.pop:
         #print(ind.val)
@@ -126,17 +152,17 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
             print(ind.val)
         print('##################')
         '''
-        # Selection
-        p.pop = s.returnSelection(p)
+        # Parent Selection
+        p.parents = s.returnSelection(p)
 
         '''print('##################')
-        print('After Selection')
+        print('After Parent Selection')
         for ind in p.pop:
             print(ind.val)
         print('##################')
         '''
         # Mutation
-        for ind in p.pop:
+        for ind in p.parents:
             ind.mutate(mutation_rate)
         
         '''print('##################')
@@ -147,20 +173,18 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
         '''
         
         # Crossover
-        child_pop = []
-        parent_pop = p.pop.copy()
-        for ind in p.pop:
+        
+        # Mew , Lambda Survivor Selection
+        # clears the population
+        p.pop = []
+        while len(p.pop) < p.pop_size:
+            ind = random.choice(p.parents)
             r = random.random()
             if r <= cross_over_rate:
-                ind2 = random.choice(parent_pop)
-                ind.val = ind.singlePointCrossover(ind2)
-                
-                #ind1, ind2 = ind.singlePointCrossover(ind2)
-                #child_pop.append(random.choice([ind1,ind2]))
-            #else:
-            #    child_pop.append(ind.val)
-        random.shuffle(p.pop)
-        
+                ind2 = random.choice(p.parents)
+                ind = ind.crossover(ind2)
+            p.pop.append(ind)
+
         '''
         print('##################')
         print('After Crossover')
@@ -168,8 +192,8 @@ def main(population_size, individual_size, individual_split, fit, cross_over_rat
             print(ind.val)
         print('##################')
         '''
-            
-        #i = 0
+
+        # Calculates the fitness of the new population
         for ind in p.pop:
             #ind.val = child_pop[i]
             ind.fit = f.returnFitness(ind)
