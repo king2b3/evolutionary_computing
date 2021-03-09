@@ -13,7 +13,7 @@ class Fitness(abc.ABC):
     def __init__(self) -> None:
         ''' Abstract class that contains a fitness function
         '''
-        None
+        self.fit_count = 0
 
     @abc.abstractmethod
     def returnFitness(self, ind) -> float:
@@ -28,33 +28,74 @@ class Fitness(abc.ABC):
         pass
 
 
-class HimmelblauMax(Fitness):
+# task 1
+class Himmelblau(Fitness):
     def returnFitness(self, ind) -> float:
-        ''' Returns the fitness of an individual
+        '''Returns the fitness of an individual
         '''
         return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
-        
+    
     def checkTerminate(self, p) -> bool:
-        ''' Returns True if the termination conditions are met
+        '''Returns True if the termination conditions are met
         '''
         count = 0
         for ind in p.pop:
-            if ind.fit >= 181.617:
+            self.fit_count += 1
+            if ind.fit == 0.0:
                 count+=1
         return count == p.pop_size
 
 
-class HimmelblauMin(Fitness):
+# the task 3 implementation which needs to convert he bit string into floats for the calculations
+class HimmelblauTask3(Fitness):
+    def translate(self, n, split=0) -> float:
+        ''' Returns the float value from IEEE 745
+        '''
+        if split != 0:
+            pass
+        else:
+            split = math.ceil(len(n)/2) - 1
+
+        # determins the sign of the number
+        if n[0]:
+            sign = -1
+        else:
+            sign = 1
+
+        # splits the list into the left and right sides of the float
+        left = n[1:split]
+        right = n[split:]
+
+        # combines the left hand side into an int
+        left = int(bin(int(''.join(map(str, left)), 2)), 2)
+        
+        # adds the right hand floating value to the left side
+        new_right = 0
+        temp = 0.5
+        for m in right:
+            if m:
+                new_right += temp
+            temp = temp / 2
+        return (sign) * (left + new_right)   
+
     def returnFitness(self, ind) -> float:
         ''' Returns the fitness of an individual
         '''
-        return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
+        x = self.translate(ind.val[:int(ind.size/ind.num_of_variables)])
+        y = self.translate(ind.val[int(ind.size/ind.num_of_variables):])
+        # just used for plotting stats
+        ind.x = x
+        ind.y = y
+        # increment number of fitness calcs 
+        self.fit_count += 1
+        return ((x**2 + y - 11)**2 + (x + y**2 -7)**2)
     
     def checkTerminate(self, p) -> bool:
         ''' Returns True if the termination conditions are met
         '''
         count = 0
         for ind in p.pop:
+            self.fit_count += 1
             if ind.fit == 0.0:
                 count+=1
         return count == p.pop_size

@@ -20,6 +20,7 @@ class Selection(abc.ABC):
         '''
         pass
 
+
 class UniformRandom(Selection):
     """Uniform Random Selection for parents
 

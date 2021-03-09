@@ -10,7 +10,8 @@
 import abc
 import random
 random.seed()
-from ga.individual import FloatingPoint
+from src.ga.individual import FloatingPoint
+from src.ga.individual import BitString
 
 
 class Population(abc.ABC):
@@ -27,6 +28,11 @@ class Population(abc.ABC):
         """Returns the max fitness in the current population
         """
         return max(self.pop, key=lambda i: i.fit).fit
+
+    def getMinInd(self) -> float:
+        """Returns the max fitness in the current population
+        """
+        return min(self.pop, key=lambda i: i.fit).fit
     
     def getAverageInd(self) -> float:
         """Returns the average fitness of hte population 
@@ -40,7 +46,7 @@ class Population(abc.ABC):
         Dependant on the individual type
         """
         ...
-    
+        
     def popStats(self) -> list:
         """Prints out the stats of a population
         """
@@ -50,7 +56,7 @@ class Population(abc.ABC):
 
 
 class MewLambda(Population):
-    ''' Supports Mew Lambda populations
+    ''' Supports Mew Lambda populations for Task 1 with Floating Point individuals
     '''
     def __init__(self, pop_size=100, mew=15) -> None:
         self.pop_size = pop_size
@@ -59,8 +65,35 @@ class MewLambda(Population):
         self.parents = []
         self.generate()
 
+        # plotting lists
+        self.average_performance = []
+        self.best_performance = []
+        self.euclidean = []
+
+    def getPlotStats(self):
+        """Saves the current stats that will be plotted at the end of the EA
+        """
+        self.average_performance.append(self.getAverageInd())
+        self.best_performance.append(self.getMinInd())
+        max_dist = 0
+        # dumb but easy way to find max euclidean distance between two points in the population
+        for ind1 in self.pop:
+            for ind2 in self.pop:
+                dist = ((ind1.x - ind2.x)**2 + (ind1.y - ind2.y)**2)**.5
+                if dist > max_dist:
+                    max_dist = dist
+        self.euclidean.append(max_dist)
+
+    def popStats(self) -> list:
+        """Prints out the stats of a population
+        """
+        return f"{self.getMinInd():.4f}", \
+                f"{self.getAverageInd():.4f}", \
+                f"{self.getNumSame():.4f}"
+
     def generate(self) -> None:
-        # creates pop_size individuals. Adds instances of the individuals to a list
+        """creates individuals. Adds instances of the individuals to a list
+        """
         for _ in range(self.pop_size):
             self.pop.append(FloatingPoint())
         
@@ -78,6 +111,66 @@ class MewLambda(Population):
         # counts each unique individuals 
         for ind in self.pop:
             num_stats["{:.5f}".format(ind.x + ind.y)] += 1
+        # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
+        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+            
+        return count / self.pop_size 
+
+# same as above but for task 3
+class MewLambdaBitString(Population):
+    ''' Supports Mew Lambda populations
+    '''
+    def __init__(self, ind_size=16, pop_size=100, mew=15) -> None:
+        self.pop_size = pop_size
+        self.mew = mew
+        self.pop = []
+        self.parents = []
+        self.ind_size = ind_size
+        self.generate()
+
+        # plotting lists
+        self.average_performance = []
+        self.best_performance = []
+        self.euclidean = []
+
+    def getPlotStats(self):
+        self.average_performance.append(self.getAverageInd())
+        self.best_performance.append(self.getMinInd())
+        max_dist = 0
+        # dumb but easy way to find max euclidean distance between two points in the population
+        for ind1 in self.pop:
+            for ind2 in self.pop:
+                dist = ((ind1.x - ind2.x)**2 + (ind1.y - ind2.y)**2)**.5
+                if dist > max_dist:
+                    max_dist = dist
+        self.euclidean.append(max_dist)
+
+    def popStats(self) -> list:
+        """Prints out the stats of a population
+        """
+        return f"{self.getMinInd():.4f}", \
+                f"{self.getAverageInd():.4f}", \
+                f"{self.getNumSame():.4f}"
+
+    def generate(self) -> None:
+        # creates pop_size individuals. Adds instances of the individuals to a list
+        for _ in range(self.pop_size):
+            self.pop.append(BitString(self.ind_size))
+        
+    def getNumSame(self) -> float:
+        """Create a dictionary where each key is every unique individual in the population
+        The number of each individuals are counted.
+        % unique = Total number with count > 2 / total individuals 
+
+        Returns
+            % unique individuals in the population
+        """
+        # allows a default key in the dictionary with a default value of 0. 
+        from collections import defaultdict 
+        num_stats = defaultdict(lambda: 0)
+        # counts each unique individuals 
+        for ind in self.pop:
+            num_stats[str(ind.val)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
         return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
             

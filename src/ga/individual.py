@@ -40,53 +40,26 @@ class Individual(abc.ABC):
         '''
         pass
 
-class BitString(Individual):
-    ''' Bitstring representation genotype
-          EX/ [1,0,1,1,1]
-    '''
-    def __init__(self, size, num_of_variables, val=None) -> None:
-        self.size = size
-        self.num_of_variables = num_of_variables
-        # inits class with parent methods and variables
-        super().__init__()
-        if val:
-            self.val = val
-        else:
-            self.generate()
+    @abc.abstractmethod
+    def __str__(self) -> str:
+        """For visual representation when the instance is printed
+        """
+        ...
 
-    def generate(self) -> None:
-        # sets value as a random list of 0s and 1s to the self.size
-        self.val = random.choices([0,1],k=self.size)
-    
-    def mutate(self, mut_rate) -> None:
-        # bitwise mutation rate
-        for location in range(self.size):
-            r = random.random()
-            if r <= mut_rate:
-                # 1 - 1 = 0 or 1 - 0 = 1. Flips the bits
-                self.val[location] = 1 - self.val[location]
-
-    def crossover(self, ind2) -> list:
-        # picks random location in the bit string
-        loc = random.randint(1,self.size-2)
-        # creates temps of the two individuals
-        temp1 = self.val.copy()
-        temp2 = ind2.val.copy()
-        # crossover at point loc
-        ind1 = temp1[:loc] + temp2[loc:]
-        return ind1
-    
 
 class FloatingPoint(Individual):
     def __init__(self, max_val=10, min_val=-10, x:int=None, y:int=None, ox=1, oy=1) -> None:
         super().__init__()
-
+        # standard deviations 
         self.sigma_x = ox
         self.sigma_y = oy
+        # x and y values
         if x and y:
+            # if both x and y are given. IE decalring a new individual with crossover
             self.x = x
             self.y = y
         else:
+            # if a new individual is being created from scratch
             self.generate(max_val, min_val)
     
     def generate(self, max_val, min_val) -> None:
@@ -107,7 +80,7 @@ class FloatingPoint(Individual):
           Thinking about using themselves as standard deviation values, instead of using fixed values
         """
         for val, dev in [[self.x, self.sigma_x,], [self.y, self.sigma_y],
-                [self.sigma_x, 1], [self.sigma_y, 1]]:
+                [self.sigma_x, self.sigma_x], [self.sigma_y, self.sigma_y]]:
             r = random.random()
             if r <= mut_rate:
                 val = npr.normal(val,dev)
@@ -139,7 +112,55 @@ class FloatingPoint(Individual):
             self.y = 10
         elif self.y < -10:
             self.y = -10
+        
+        self.sigma_x = abs(self.sigma_x)
+        self.sigma_y = abs(self.sigma_y)
+    
+    def __str__(self) -> str:
+        return f"X :{self.x} Y:{self.y}"
 
+
+class BitString(Individual):
+    ''' Bitstring representation genotype
+          EX/ [1,0,1,1,1]
+    '''
+    def __init__(self, size, num_of_variables=2, val=None) -> None:
+        self.size = size
+        self.num_of_variables = num_of_variables
+        # inits class with parent methods and variables
+        super().__init__()
+        if val:
+            self.val = val
+        else:
+            self.generate()
+        self.x = 0
+        self.y = 0
+
+    def generate(self) -> None:
+        # sets value as a random list of 0s and 1s to the self.size
+        self.val = random.choices([0,1],k=self.size)
+    
+    def mutate(self, mut_rate) -> None:
+        # bitwise mutation rate
+        for location in range(self.size):
+            r = random.random()
+            if r <= mut_rate:
+                # 1 - 1 = 0 or 1 - 0 = 1. Flips the bits
+                self.val[location] = 1 - self.val[location]
+
+    def crossover(self, ind2) -> list:
+        # picks random location in the bit string
+        loc = random.randint(1,self.size-2)
+        # creates temps of the two individuals
+        temp1 = self.val.copy()
+        temp2 = ind2.val.copy()
+        # crossover at point loc
+        ind1 = temp1[:loc] + temp2[loc:]
+        return BitString(self.size, val=ind1)
+    
+    def __str__(self) -> str:
+        return str(self.val)
+    
 
 def main():
     # testing function

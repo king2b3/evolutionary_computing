@@ -6,6 +6,9 @@ homework_files/
 test.py
 assignment1/
 assignment1.zip
+task1/
+task3/
+*.jpeg
 # C extensions
 *.so
 
