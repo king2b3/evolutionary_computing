@@ -87,8 +87,8 @@ class Tournament(Selection):
     def returnSelection(self, population, k=2) -> list:
         parent_pop = []
         while len(parent_pop) < population.pop_size:
-            tournament = random.choices(population.pop,k=4)
-            parent_pop.append(max(tournament, key=lambda i: i.fit))
+            tournament = random.choices(population.pop,k=2)
+            parent_pop.append(max(population.pop, key=lambda i: i.fit))
         return parent_pop
     
 class Random(Selection):
