@@ -38,7 +38,7 @@ def parse_arguments(args=None) -> None:
     parser.add_argument('-s','--selection_type', default='roulette',
             help='The type of selection function used. Options: random, uniform, roulette, tournament.')
     parser.add_argument('-k', default=1, type=int,
-            help='K-point crossover. Options in range [1:Genome Size - 1]')
+            help='Tournament Size. Options in range [0:Population Size]')
     parser.add_argument('-p', '--pop', default="fixed", type=str,
             help='Population type. Options: fixed, mew_lambda, mew_lambda_bit_string')
     args = parser.parse_args(args=args)
@@ -99,25 +99,59 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
         p = population(pop_size=lambda_size, mew=mu_size, ind_size=individual_size)
 
     # Other library imports    
-    from tabulate import tabulate   # pretty plotting
-    from os import system           # for clearing the terminal
     import random                   # random library
-    random.seed()                   # seeding the random num gengerator
+    random.seed()                   # seeding the random num gengerator 
 
-    # function to clear the terminal
-    def clear():
-        _ = system("clear")
-    
-    # clears the screen before the EA starts
-    clear()    
-
-    fit_count = []
-    print_list = [['Fitness type','Mu Size','Lambda Size','Mutation STD','Mutation Rate',
-                    'Crossover Rate'],
-                [fit, mu_size, lambda_size, 1, mutation_rate, cross_over_rate]]
-    print(tabulate(print_list))
     f = fitness()
     s = selection()
+
+    #parameter sweeps
+    for mr in range(0,.49,.01): # mutation rate
+        for k in range (0,49,1): # k tournament range
+            # init test
+            for _ in range(4): # average test results
+            
+            # average and save results
+    
+    # plot results
+    # 3-d plot
+    '''
+    from mpl_toolkits import mplot3d
+    %matplotlib inline
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+
+    # Data for a three-dimensional line
+    zline = np.linspace(0, 15, 1000)
+    xline = np.sin(zline)
+    yline = np.cos(zline)
+    ax.plot3D(xline, yline, zline, 'gray')
+
+    # Data for three-dimensional scattered points
+    zdata = 15 * np.random.random(100)
+    xdata = np.sin(zdata) + 0.1 * np.random.randn(100)
+    ydata = np.cos(zdata) + 0.1 * np.random.randn(100)
+    ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='Greens')
+    '''
+
+    # 2-d plot
+    '''
+    epochs = list(range(len(mutations_time)))
+
+    plt.plot(epochs,mutations_time,'ko',label="Mutations Time")
+    plt.plot(epochs,fitness_time,'bx',label="Fitness Time")
+    plt.xlabel('Epochs')
+    plt.ylabel('Time (sec)')
+    plt.title('Time for each portion during training')
+    plt.legend()
+    plt.savefig('outputs/time_plot.jpeg')
+    '''
+
+            
+
 
         
     for ind in p.pop:
@@ -125,36 +159,17 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
 
     gen = 0
     
-    print('########################################################################################')
-    print('Generation','\t','Candidate Evals','\t','Best Fit','\t','Average Fit','\t','% same','\t',)
+
 
     # I don't like to leave multiline comments in the code, but I left these since I found them to be helpful for debugging
     while gen < max_gens and not f.checkTerminate(p):
-        '''print('##################')
-        print('Initial Population')
-        for ind in p.pop:
-            print(ind.val)
-        print('##################')
-        '''
+
         # Parent Selection
         p.parents = s.returnSelection(p)
 
-        '''print('##################')
-        print('After Parent Selection')
-        for ind in p.pop:
-            print(ind.val)
-        print('##################')
-        '''
         # Mutation
         for ind in p.parents:
             ind.mutate(mutation_rate)
-        
-        '''print('##################')
-        print('After Mutation')
-        for ind in p.pop:
-            print(ind.val)
-        print('##################')
-        '''
         
         # Crossover
         
@@ -169,63 +184,11 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
                 ind = ind.crossover(ind2)
             p.pop.append(ind)
 
-        '''
-        print('##################')
-        print('After Crossover')
-        for ind in p.pop:
-            print(ind.val)
-        print('##################')
-        '''
-
         # Calculates the fitness of the new population
         for ind in p.pop:
             ind.fit = f.returnFitness(ind)
 
-        gen += 1
-        m, a, per = p.popStats()
-        if maxFit:
-            if best_m < float(m) : best_m = float(m)
 
-        else:
-            if best_m > float(m) : best_m = float(m)
-
-        print(gen,'\t\t',f.fit_count,'\t\t\t',m,'\t',a,'\t',per,'%')
-
-        # saves stats that will be plotted
-        p.getPlotStats()
-        fit_count.append(f.fit_count)
-
-    if gen == max_gens:
-        print(f"Best fit {best_m}")
-    # wont print this is the EA terminated early, since every member of the population was the desired solution
-
-    
-    # Plots the 3 plots for task 2
-    import matplotlib.pyplot as plt
-
-    # Average Performance
-    plt.figure()
-    plt.plot(fit_count, p.average_performance,'bo',label="Average Performance")
-    plt.xlabel('Candidate Evaluations')
-    plt.ylabel('Average Performance')
-    plt.title('Average Performance of Population for the Himmelblau Function')
-    plt.savefig('average_performance.jpeg')
-
-    # Euclidean Distance
-    plt.figure()
-    plt.plot(fit_count, p.euclidean,'ko',label="Euclidean Distance")
-    plt.xlabel('Candidate Evaluations')
-    plt.ylabel('Euclidean Distance')
-    plt.title('Euclidean Distance of Population for the Himmelblau Function')
-    plt.savefig('euclidean_performance.jpeg')
-
-    # Best Performance
-    plt.figure()
-    plt.plot(fit_count, p.best_performance,'ro',label="Best Performance")
-    plt.xlabel('Candidate Evaluations')
-    plt.ylabel('Best Performance')
-    plt.title('Best Performance of Population for the Himmelblau Function')
-    plt.savefig('best_performance.jpeg')
 
     return None
 
