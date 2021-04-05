@@ -53,6 +53,7 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
     # class imports based off of arg parsing
     
     # fitness
+    """
     if fit == 'rosenbrock':
         from src.a.fitness import RosenbrockFixed as fitness
         maxFit = False
@@ -77,8 +78,10 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
         best_m = 999999
         best_a = 999999
         best_per = 999999
+    """
     
     # selection
+    """
     if selection_type == 'random':
         from src.ga.selection import Random as selection
     elif selection_type == 'tournament':
@@ -87,31 +90,81 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
         from src.ga.selection import UniformRandom as selection
     else:
         from src.ga.selection import RouletteWheelSelection as selection
-    
-    # population type
-    if pop == 'fixed':
-        from src.ga.population import FixedSize as population 
-    elif pop == "mew_lambda":
-        from src.ga.population import MewLambda as population
-        p = population(pop_size=lambda_size, mew=mu_size)
-    else:
-        from src.ga.population import MewLambdaBitString as population
-        p = population(pop_size=lambda_size, mew=mu_size, ind_size=individual_size)
+    """
 
-    # Other library imports    
-    import random                   # random library
-    random.seed()                   # seeding the random num gengerator 
+    from src.ga.selection import Tournament as selection
 
-    f = fitness()
-    s = selection()
 
     #parameter sweeps
+    results = []
+    mr_range = []
+    k_range = []
     for mr in range(0,.49,.01): # mutation rate
         for k in range (0,49,1): # k tournament range
             # init test
+            ave_final_fit = []
             for _ in range(4): # average test results
-            
-            # average and save results
+                
+
+                """ BEGIN TEST """
+                # population type
+                if pop == 'fixed':
+                    from src.ga.population import FixedSize as population 
+                elif pop == "mew_lambda":
+                    from src.ga.population import MewLambda as population
+                    p = population(pop_size=lambda_size, mew=mu_size)
+                else:
+                    from src.ga.population import MewLambdaBitString as population
+                    p = population(pop_size=lambda_size, mew=mu_size, ind_size=individual_size)
+
+                # Other library imports    
+                import random                   # random library
+                random.seed()                   # seeding the random num gengerator 
+
+                f = fitness()
+                s = selection()
+                gen = 0
+
+                # init fitness calcs of the init population
+                for ind in p.pop:
+                    ind.fit = f.returnFitness(ind)
+                    # need to fix fitness functions 
+
+                while gen < max_gens and not f.checkTerminate(p):
+
+                    # Parent Selection
+                    p.parents = s.returnSelection(p,k)
+
+                    # Mutation
+                    for ind in p.parents:
+                        ind.mutate(mr)
+                    
+                    # Crossover
+                    
+                    # Mew , Lambda Survivor Selection
+                    # clears the population
+                    p.pop = []
+                    while len(p.pop) < p.pop_size:
+                        ind = random.choice(p.parents)
+                        r = random.random()
+                        if r <= cross_over_rate:
+                            ind2 = random.choice(p.parents)
+                            ind = ind.crossover(ind2)
+                        p.pop.append(ind)
+
+                    # Calculates the fitness of the new population
+                    for ind in p.pop:
+                        ind.fit = f.returnFitness(ind)
+                        # average and save results
+                    
+                    gen += 0
+                # save result of test
+                ave_final_fit.append(p.getMinInd())
+            # add averaged min fitness to results for param
+            results.append((sum(ave_final_fit)/len(ave_final_fit)))
+            mr_range.append(mr)
+            k_range.append(k)
+                
     
     # plot results
     # 3-d plot
@@ -149,46 +202,6 @@ def main(mu_size, lambda_size, individual_size, individual_split, fit, cross_ove
     plt.legend()
     plt.savefig('outputs/time_plot.jpeg')
     '''
-
-            
-
-
-        
-    for ind in p.pop:
-        ind.fit = f.returnFitness(ind)
-
-    gen = 0
-    
-
-
-    # I don't like to leave multiline comments in the code, but I left these since I found them to be helpful for debugging
-    while gen < max_gens and not f.checkTerminate(p):
-
-        # Parent Selection
-        p.parents = s.returnSelection(p)
-
-        # Mutation
-        for ind in p.parents:
-            ind.mutate(mutation_rate)
-        
-        # Crossover
-        
-        # Mew , Lambda Survivor Selection
-        # clears the population
-        p.pop = []
-        while len(p.pop) < p.pop_size:
-            ind = random.choice(p.parents)
-            r = random.random()
-            if r <= cross_over_rate:
-                ind2 = random.choice(p.parents)
-                ind = ind.crossover(ind2)
-            p.pop.append(ind)
-
-        # Calculates the fitness of the new population
-        for ind in p.pop:
-            ind.fit = f.returnFitness(ind)
-
-
 
     return None
 

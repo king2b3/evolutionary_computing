@@ -28,6 +28,68 @@ class Fitness(abc.ABC):
         pass
 
 
+class RosenbrockNDim(Fitness):
+    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
+
+        First half of the individual is x, second half is y.
+        
+        For an individual sized N, a fixed point splits is like this
+          X = S(N/4,N/4)
+    '''
+    def translate(self, n, split=0) -> float:
+        ''' Returns the float value from IEEE 745
+        '''
+        if split != 0:
+            pass
+        else:
+            split = math.ceil(len(n)/2) - 1
+
+        # determins the sign of the number
+        if n[0]:
+            sign = -1
+        else:
+            sign = 1
+
+        # splits the list into the left and right sides of the float
+        left = n[1:split]
+        right = n[split:]
+
+        # combines the left hand side into an int
+        left = int(bin(int(''.join(map(str, left)), 2)), 2)
+        
+        # adds the right hand floating value to the left side
+        new_right = 0
+        temp = 0.5
+        for m in right:
+            if m:
+                new_right += temp
+            temp = temp / 2
+        return (sign) * (left + new_right)
+
+    def returnFitnessSGA(self, individual, a=1, b=100) -> float:
+        # splits the individual into multiple variables
+        sum = 0
+        for x in individual.val:
+            x_temp = self.translate()
+            # insert equation here
+            
+
+        # returns the rosenbrock value of the two variables
+        return 
+
+    def returnFitnessES(self, ind) -> float:
+        sum = 0
+        for x in ind.vals:
+            # insert equation here
+            pass
+        return 
+
+    def checkTerminate(self, p) -> bool:
+        # if the population is all 1,1 IE the fit of each individual is 0
+        return 0 == min(i.fit for i in p.pop)
+
+
+
 # task 1
 class Himmelblau(Fitness):
     def returnFitness(self, ind) -> float:
