@@ -58,11 +58,12 @@ class Population(abc.ABC):
 class MewLambda(Population):
     ''' Supports Mew Lambda populations for Task 1 with Floating Point individuals
     '''
-    def __init__(self, pop_size=100, mew=15) -> None:
+    def __init__(self, pop_size=100, mew=15, n=4) -> None:
         self.pop_size = pop_size
         self.mew = mew
         self.pop = []
         self.parents = []
+        self.n = n
         self.generate()
 
         # plotting lists
@@ -95,7 +96,7 @@ class MewLambda(Population):
         """creates individuals. Adds instances of the individuals to a list
         """
         for _ in range(self.pop_size):
-            self.pop.append(FloatingPoint())
+            self.pop.append(FloatingPoint(self.n))
         
     def getNumSame(self) -> float:
         """Create a dictionary where each key is every unique individual in the population
@@ -180,16 +181,18 @@ class MewLambdaBitString(Population):
 class FixedSize(Population):
     ''' Canonical Genetic Algorithm
     '''
-    def __init__(self, pop_size, ind_size, num_of_variables) -> None:
+    def __init__(self, pop_size, n) -> None:
         self.pop_size = pop_size
         self.pop = []
-        self.ind_size = ind_size
-        self.generate(ind_size,num_of_variables)
+        self.ind_size = 7*n
+        self.n = n
+        self.generate()
+        
 
-    def generate(self, ind_size, num_of_variables) -> None:
+    def generate(self) -> None:
         # creates pop_size individuals. Adds instances of the individuals to a list
         for _ in range(self.pop_size):
-            self.pop.append(BitString(ind_size,num_of_variables))
+            self.pop.append(BitString(self.ind_size,self.n))
         
     def getNumSame(self) -> float:
         """Create a dictionary where each key is every unique individual in the population

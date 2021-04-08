@@ -72,7 +72,7 @@ class RouletteWheelSelection(Selection):
                     i += 1
                 parent_pop.append(p.pop[i])
         return parent_pop
-   
+
 class Tournament(Selection):
     ''' Tournament selection type. K individuals are selected, and face off in a 
           tournament where the best individual is then passed onto the parent 

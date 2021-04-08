@@ -14,12 +14,6 @@ class Fitness(abc.ABC):
         ''' Abstract class that contains a fitness function
         '''
         self.fit_count = 0
-
-    @abc.abstractmethod
-    def returnFitness(self, ind) -> float:
-        ''' Returns the fitness of an individual
-        '''
-        pass
     
     @abc.abstractmethod
     def checkTerminate(self, pop) -> bool:
@@ -66,27 +60,52 @@ class RosenbrockNDim(Fitness):
             temp = temp / 2
         return (sign) * (left + new_right)
 
-    def returnFitnessSGA(self, individual, a=1, b=100) -> float:
+    def returnFitnessSGA(self, ind) -> float:
         # splits the individual into multiple variables
-        sum = 0
-        for x in individual.val:
-            x_temp = self.translate()
-            # insert equation here
-            
-
+        sum_fit = 0
+        for x in range(0,len(ind.val)-7,7):
+            x_i = self.translate(ind.val[x:x+7])
+            x_1 = self.translate(ind.val[x+7:x+14])
+            if x_i > 5.11:
+                x_i = 5.11
+            elif x_i < -5.12:
+                x_i = -5.12
+            if x_1 > 5.11:
+                x_1 = 5.11
+            elif x_1 < -5.12:
+                x_1 = -5.12
+            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2            
         # returns the rosenbrock value of the two variables
-        return 
+        self.fit_count += 1
+        return sum_fit
 
     def returnFitnessES(self, ind) -> float:
-        sum = 0
-        for x in ind.vals:
-            # insert equation here
-            pass
-        return 
+        sum_fit = 0
+        for x in range(len(ind.val[:-1])):
+            x_1 = ind.val[x+1]
+            x_i = ind.val[x]
+            if x_i > 5.11:
+                x_i = 5.11
+            elif x_i < -5.12:
+                x_i = -5.12
+            if x_1 > 5.11:
+                x_1 = 5.11
+            elif x_1 < -5.12:
+                x_1 = -5.12
+            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2 
+        # return summed fitness
+        self.fit_count += 1
+        return sum_fit
 
     def checkTerminate(self, p) -> bool:
         # if the population is all 1,1 IE the fit of each individual is 0
         return 0 == min(i.fit for i in p.pop)
+    
+    def checkTerminateNDim(self, p) -> bool:
+        for i in p.pop:
+            if i.fit == 0:
+                return True
+        return False
 
 
 
