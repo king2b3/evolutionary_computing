@@ -7,52 +7,13 @@
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
 '''
-import abc
 import random
 random.seed()
-from src.ga.individual import FloatingPoint
-from src.ga.individual import BitString
 
 
-class Population(abc.ABC):
-    def __init__(self, pop_size) -> None:
-        ...
-
-    @abc.abstractmethod
-    def generate(self) -> None:
-        """Generates a random population of size pop_size
-        """
-        ...
-    
-    def getMaxInd(self) -> float:
-        """Returns the max fitness in the current population
-        """
-        return max(self.pop, key=lambda i: i.fit).fit
-
-    def getMinInd(self) -> float:
-        """Returns the max fitness in the current population
-        """
-        return min(self.pop, key=lambda i: i.fit).fit
-    
-    def getAverageInd(self) -> float:
-        """Returns the average fitness of hte population 
-        """
-        return sum(i.fit for i in self.pop) / self.pop_size
-    
-    @abc.abstractmethod
-    def getNumSame(self) -> float:
-        """Returns the number of unique individuals in the population
-
-        Dependant on the individual type
-        """
-        ...
-        
-    def popStats(self) -> list:
-        """Prints out the stats of a population
-        """
-        return f"{self.getMaxInd():.4f}", \
-                f"{self.getAverageInd():.4f}", \
-                f"{self.getNumSame():.4f}"
+from ec.individual.individual import FloatingPoint
+from ec.individual.individual import BitString
+from ec.engine.population import Population
 
 
 class MewLambda(Population):
@@ -212,13 +173,3 @@ class FixedSize(Population):
         return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
             
         return count / self.pop_size  
-    
-
-
-def main():
-    # testing function
-    b = Population(10,4,2)
-    print(b.pop)
-
-if __name__ == "__main__":
-    main()

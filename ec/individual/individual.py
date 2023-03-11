@@ -5,61 +5,20 @@
     Created by: Bayley King (https://github.com/king2b3)
 '''
 
-import abc
 import random
 from numpy import random as npr
 random.seed()
 
-class Individual(abc.ABC):
-    ''' Abstract structure for an individual.
-          Initializes their fitness to 0.
-    '''
-    def __init__(self) -> None:
-        self.fit = 0
-        self.fit_score = 0
-
-    @abc.abstractmethod
-    def generate(self) -> None:
-        ''' Method to generate a random individual
-        '''
-        pass
-
-    @abc.abstractmethod
-    def mutate(self, mut_rate) -> float:
-        ''' Method to mutate the individual
-        '''
-        pass
-
-    @abc.abstractmethod
-    def crossover(self, ind2) -> list:
-        ''' Method to crossover the individual with another individual
-              Single point crossover
-            
-            Might make mutate and crossover into their own child classes of
-              individual later. 
-        '''
-        pass
-
-    @abc.abstractmethod
-    def __str__(self) -> str:
-        """For visual representation when the instance is printed
-        """
-        ...
-
+from ec.engine.individual import Individual
 
 class FloatingPoint(Individual):
-    def __init__(self, max_val=10, min_val=-10, x:int=None, y:int=None, ox=1, oy=1) -> None:
+    def __init__(self, n, max_val=5.11, min_val=-5.12, ox=1, oy=1) -> None:
         super().__init__()
         # standard deviations 
-        self.sigma_x = ox
-        self.sigma_y = oy
+        self.val = []
+        self.o = []
         # x and y values
-        if x and y:
-            # if both x and y are given. IE decalring a new individual with crossover
-            self.x = x
-            self.y = y
-        else:
-            # if a new individual is being created from scratch
+        for _ in range(n):
             self.generate(max_val, min_val)
     
     def generate(self, max_val, min_val) -> None:
@@ -67,8 +26,8 @@ class FloatingPoint(Individual):
 
         Uniform chance to pick a value between min and max values
         """
-        self.x = random.uniform(min_val, max_val)
-        self.y = random.uniform(min_val, max_val)
+        self.val.append(random.uniform(min_val, max_val))
+        self.o.append(1)
  
     def mutate(self, mut_rate) -> None:
         """Gaussian Perturbation Mutation
@@ -79,42 +38,34 @@ class FloatingPoint(Individual):
         Standard devitation of 1 is used when mutating Sigma_X and Sigma_Y. 
           Thinking about using themselves as standard deviation values, instead of using fixed values
         """
-        for val, dev in [[self.x, self.sigma_x,], [self.y, self.sigma_y],
-                [self.sigma_x, self.sigma_x], [self.sigma_y, self.sigma_y]]:
+        for val, dev in zip(self.val, self.o):
             r = random.random()
             if r <= mut_rate:
                 val = npr.normal(val,dev)
         self.checkRange()
     
-    def crossover(self, ind2) -> "Individual":
+    def crossover(self, ind2) -> None:
         """Performs an intermediate recombination of two individuals
 
         Returns:
         New individual, which is the child of the two parents
         """
-        a = random.random()
-        new_x = (self.x * a) + ((1-a) * ind2.x)
-        new_y = (self.y * a) + ((1-a) * ind2.y)
-        new_sigma_x = (self.sigma_x * a) + ((1-a) * ind2.sigma_x)
-        new_sigma_y = (self.sigma_y * a) + ((1-a) * ind2.sigma_y)
-        return FloatingPoint(x=new_x, y=new_y, ox=new_sigma_x, oy=new_sigma_y)
+        for i in range(len(self.val)):
+            a = random.random()
+            self.val[i] = (self.val[i] * a) + ((1-a) * ind2.val[i])
+            self.o[i] = (self.o[i] * a) + ((1-a) * ind2.o[i])
     
     def checkRange(self):
         """Checks if X or y are above 10 or below -10.
         If so, then the values are capped at the max ranges
         """
-        if self.x > 10:
-            self.x = 10
-        elif self.x < -10:
-            self.x = -10
-        
-        if self.y > 10:
-            self.y = 10
-        elif self.y < -10:
-            self.y = -10
-        
-        self.sigma_x = abs(self.sigma_x)
-        self.sigma_y = abs(self.sigma_y)
+        for x in self.val:
+            if x > 5.11:
+                x = 5.11
+            elif x < -5.12:
+                x = -5.12
+        for o in self.o:
+            o = abs(o)
     
     def __str__(self) -> str:
         return f"X :{self.x} Y:{self.y}"
@@ -133,8 +84,6 @@ class BitString(Individual):
             self.val = val
         else:
             self.generate()
-        self.x = 0
-        self.y = 0
 
     def generate(self) -> None:
         # sets value as a random list of 0s and 1s to the self.size
@@ -160,17 +109,3 @@ class BitString(Individual):
     
     def __str__(self) -> str:
         return str(self.val)
-    
-
-def main():
-    # testing function
-    b = BitString(10,2)
-    c = BitString(10,2)
-    print(b.val)
-    print(c.val)
-    for _ in range(1):
-        b.val = b.singlePointCrossover(c)
-        print(b.val)
-
-if __name__ == "__main__":
-    main()

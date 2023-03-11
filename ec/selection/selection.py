@@ -4,21 +4,9 @@
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
 '''
-import abc
 import random
 random.seed()
-
-class Selection(abc.ABC):
-    def __init__(self) -> None:
-        ''' Abstract class for the selection function
-        '''
-        pass
-
-    @abc.abstractmethod
-    def returnSelection(self, pop) -> list:
-        ''' Returns the parent population
-        '''
-        pass
+from ec.engine.selection import Selection
 
 
 class UniformRandom(Selection):
@@ -50,8 +38,8 @@ class RouletteWheelSelection(Selection):
     '''
 
     def returnSelection(self, p) -> list:
-        s = sum(i.fit for i in p.pop)
-        p.pop = sorted((ind for ind in p.pop), key=lambda ind: ind.fit)
+        s = sum(i.fitness for i in p.pop)
+        p.pop = sorted((ind for ind in p.pop), key=lambda ind: ind.fitness)
         if s == 0: 
             # case when the population is all individuals of all 0s
             # no need to run the function, since they are all the same
@@ -60,9 +48,9 @@ class RouletteWheelSelection(Selection):
             # determines the proportional fitness 
             for i in range(p.pop_size):
                 if i == 0:
-                    p.pop[i].fit_score = p.pop[i].fit / s
+                    p.pop[i].fit_score = p.pop[i].fitness / s
                 else:
-                    p.pop[i].fit_score = p.pop[i-1].fit_score + (p.pop[i].fit / s)
+                    p.pop[i].fit_score = p.pop[i-1].fit_score + (p.pop[i].fitness / s)
             parent_pop = []
             # runs the roulette wheel
             for n in range(p.pop_size):
@@ -88,7 +76,7 @@ class Tournament(Selection):
         parent_pop = []
         while len(parent_pop) < population.pop_size:
             tournament = random.choices(population.pop,k=4)
-            parent_pop.append(max(tournament, key=lambda i: i.fit))
+            parent_pop.append(max(tournament, key=lambda i: i.fitness))
         return parent_pop
     
 class Random(Selection):
