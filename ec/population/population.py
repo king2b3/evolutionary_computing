@@ -151,7 +151,8 @@ class FixedSize(Population):
         
 
     def generate(self) -> None:
-        # creates pop_size individuals. Adds instances of the individuals to a list
+        """creates pop_size individuals. Adds instances of the individuals to a list
+        """
         for _ in range(self.pop_size):
             self.pop.append(BitString(self.ind_size,self.n))
         
@@ -171,5 +172,4 @@ class FixedSize(Population):
             num_stats[str(ind.val)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
         return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
-            
-        return count / self.pop_size  
+
