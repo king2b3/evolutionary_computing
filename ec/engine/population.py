@@ -15,12 +15,6 @@ class Population(abc.ABC):
         self.population_size = population_size
         ...
 
-    @abc.abstractmethod
-    def generate(self) -> None:
-        """Generates a random population of size pop_size
-        """
-        ...
-
     def getMaxInd(self) -> float:
         """Returns the max fitness in the current population
         """
@@ -47,6 +41,7 @@ class Population(abc.ABC):
     def popStats(self) -> list:
         """Prints out the stats of a population
         """
-        return f"{self.getMaxInd():.4f}", \
-                f"{self.getAverageInd():.4f}", \
-                f"{self.getNumSame():.4f}"
+        return f"Max fitness: {self.getMaxInd():.4f}", \
+               f"Average fitness: {self.getAverageInd():.4f}", \
+               f"Minnimum Fitness: {self.getMinInd():.4f}", \
+               f"Percent Unique: {self.getNumSame():.2f}%"

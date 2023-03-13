@@ -7,13 +7,13 @@
 import abc
 
 class Selection(abc.ABC):
-    def __init__(self) -> None:
-        ''' Abstract class for the selection function
-        '''
-        pass
+    def __init__(self, selection_size : int):
+        """Initialization of the abstract selection function
+        """
+        self.sel_size = selection_size
 
     @abc.abstractmethod
-    def returnSelection(self, pop) -> list:
+    def __call__(self, pop) -> list:
         ''' Returns the parent population
         '''
         pass

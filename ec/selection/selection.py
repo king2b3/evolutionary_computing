@@ -14,11 +14,16 @@ class UniformRandom(Selection):
 
     Each individual has the same chance to be selected
     """
-    def returnSelection(self, p) -> list:
-        p.parents = []
-        for _ in range(p.mew):
-            p.parents.append(random.choice(p.pop))
-        return p.parents
+    def __init__(self, selection_size):
+        """Creation of the Uniform Random selection function
+        """
+        super().__init__(selection_size)
+
+    def __call__(self, p) -> list:
+        new_pop = []
+        for _ in range(self.sel_size):
+            new_pop.append(random.choice(p))
+        return new_pop
 
 class RouletteWheelSelection(Selection):
     ''' Roulette Wheel Selection Function
@@ -37,28 +42,33 @@ class RouletteWheelSelection(Selection):
           C      5         .5         [.5, 1.]
     '''
 
-    def returnSelection(self, p) -> list:
-        s = sum(i.fitness for i in p.pop)
-        p.pop = sorted((ind for ind in p.pop), key=lambda ind: ind.fitness)
+    def __init__(self, selection_size):
+        """Creation of the Roulette Wheel selection function
+        """
+        super().__init__(selection_size)
+
+    def __call__(self, p) -> list:
+        s = sum(i.fitness for i in p.population)
+        p.population = sorted((ind for ind in p.population), key=lambda ind: ind.fitness)
         if s == 0: 
             # case when the population is all individuals of all 0s
             # no need to run the function, since they are all the same
-            return p.pop
+            return p.population
         else: 
             # determines the proportional fitness 
-            for i in range(p.pop_size):
+            for i in range(p.population_size):
                 if i == 0:
-                    p.pop[i].fit_score = p.pop[i].fitness / s
+                    p.population[i].fit_score = p.population[i].fitness / s
                 else:
-                    p.pop[i].fit_score = p.pop[i-1].fit_score + (p.pop[i].fitness / s)
+                    p.population[i].fit_score = p.population[i-1].fit_score + (p.population[i].fitness / s)
             parent_pop = []
             # runs the roulette wheel
-            for n in range(p.pop_size):
+            for n in range(self.sel_size):
                 r = random.random()
                 i = 0
-                while r >= p.pop[i].fit_score:
+                while r >= p.population[i].fit_score:
                     i += 1
-                parent_pop.append(p.pop[i])
+                parent_pop.append(p.population[i])
         return parent_pop
 
 class Tournament(Selection):
@@ -72,10 +82,10 @@ class Tournament(Selection):
           fitness, there isn't a direct head-to-head bracket style match up that 
           one would associate with a competitive tournament.
     '''
-    def returnSelection(self, population, k=2) -> list:
+    def __call__(self, population, k=2) -> list:
         parent_pop = []
-        while len(parent_pop) < population.pop_size:
-            tournament = random.choices(population.pop,k=4)
+        while len(parent_pop) < population.population_size:
+            tournament = random.choices(population.population,k=4)
             parent_pop.append(max(tournament, key=lambda i: i.fitness))
         return parent_pop
     
@@ -83,8 +93,8 @@ class Random(Selection):
     ''' Returns a parent population all selected randomly with replacement from 
           the current population
     '''
-    def returnSelection(self, population) -> list:
+    def __call__(self, population) -> list:
         parent_pop = []
-        while len(parent_pop) < population.pop_size:
-            parent_pop.append(random.choice(population.pop))
+        while len(parent_pop) < population.population_size:
+            parent_pop.append(random.choice(population.population))
         return parent_pop

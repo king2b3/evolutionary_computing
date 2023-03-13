@@ -75,9 +75,9 @@ class BitString(Individual):
     ''' Bitstring representation genotype
           EX/ [1,0,1,1,1]
     '''
-    def __init__(self, size, num_of_variables=2, val=None) -> None:
+    def __init__(self, size, mut_rate, val=None) -> None:
         self.size = size
-        self.num_of_variables = num_of_variables
+        self.mut_rate = mut_rate
         # inits class with parent methods and variables
         super().__init__()
         if val:
@@ -89,11 +89,11 @@ class BitString(Individual):
         # sets value as a random list of 0s and 1s to the self.size
         self.val = random.choices([0,1],k=self.size)
     
-    def mutate(self, mut_rate) -> None:
+    def mutate(self) -> None:
         # bitwise mutation rate
         for location in range(self.size):
             r = random.random()
-            if r <= mut_rate:
+            if r <= self.mut_rate:
                 # 1 - 1 = 0 or 1 - 0 = 1. Flips the bits
                 self.val[location] = 1 - self.val[location]
 
@@ -105,7 +105,7 @@ class BitString(Individual):
         temp2 = ind2.val.copy()
         # crossover at point loc
         ind1 = temp1[:loc] + temp2[loc:]
-        return BitString(self.size, val=ind1)
+        return BitString(self.size, self.mut_rate, val=ind1)
     
     def __str__(self) -> str:
         return str(self.val)
