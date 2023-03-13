@@ -16,7 +16,7 @@ class Fitness(abc.ABC):
         self.fit_count = 0
     
     @abc.abstractmethod
-    def checkTerminate(self, pop) -> bool:
+    def check_terminate(self, pop) -> bool:
         ''' Returns True if the termination conditions are met
         '''
         pass
@@ -97,12 +97,12 @@ class RosenbrockNDim(Fitness):
         self.fit_count += 1
         return sum_fit
 
-    def checkTerminate(self, p) -> bool:
+    def check_terminate(self, p) -> bool:
         # if the population is all 1,1 IE the fit of each individual is 0
-        return 0 == min(i.fit for i in p.pop)
+        return 0 == min(i.fit for i in p.population)
     
-    def checkTerminateNDim(self, p) -> bool:
-        for i in p.pop:
+    def check_terminateNDim(self, p) -> bool:
+        for i in p.population:
             if i.fit == 0:
                 return True
         return False
@@ -116,15 +116,15 @@ class Himmelblau(Fitness):
         '''
         return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
     
-    def checkTerminate(self, p) -> bool:
+    def check_terminate(self, p) -> bool:
         '''Returns True if the termination conditions are met
         '''
         count = 0
-        for ind in p.pop:
+        for ind in p.population:
             self.fit_count += 1
             if ind.fit == 0.0:
                 count+=1
-        return count == p.pop_size
+        return count == p.population_size
 
 
 # the task 3 implementation which needs to convert he bit string into floats for the calculations
@@ -159,7 +159,7 @@ class HimmelblauTask3(Fitness):
             temp = temp / 2
         return (sign) * (left + new_right)   
 
-    def returnFitness(self, ind) -> float:
+    def return_fitness(self, ind) -> float:
         ''' Returns the fitness of an individual
         '''
         x = self.translate(ind.val[:int(ind.size/ind.num_of_variables)])
@@ -171,40 +171,40 @@ class HimmelblauTask3(Fitness):
         self.fit_count += 1
         return ((x**2 + y - 11)**2 + (x + y**2 -7)**2)
     
-    def checkTerminate(self, p) -> bool:
+    def check_terminate(self, p) -> bool:
         ''' Returns True if the termination conditions are met
         '''
         count = 0
-        for ind in p.pop:
+        for ind in p.population:
             self.fit_count += 1
             if ind.fit == 0.0:
                 count+=1
-        return count == p.pop_size
+        return count == p.population_size
 
 
 class MaxOnes(Fitness):
     ''' Goal is to have the genotype be all 1s
     '''
-    def returnFitness(self, ind) -> float:
+    def return_fitness(self, ind) -> float:
         ''' Sums the individual since its just a list of 0s and 1s. 
               Divides by the length of the individual.
         '''
         # sums the list, [1,1,1,1,0,0] would have sum 4 
         return sum(ind.val)/ind.size
 
-    def checkTerminate(self, p) -> bool:
+    def check_terminate(self, p) -> bool:
         ''' Creates a list of [1,1,1,...1] the size of the desired individual
               I should pass in the full population class so it can call the length, but here we are
             Sizes based off of first entry in the population, since all individuals are the same size
             If the number of individuals that are all [1,1,1...1] = the length of the pop, the we can exit
         '''
         count = 0
-        for ind in p.pop:
+        for ind in p.population:
             # [1]*4 would result in [1,1,1,1]
-            if [1]*p.ind_size == ind.val:
+            if [1]*p.population[0].size == ind.val:
                 count += 1
         # if each individual is all 1s
-        return count == p.pop_size
+        return count == p.population_size
 
 
 class RosenbrockFixed(Fitness):
@@ -254,7 +254,7 @@ class RosenbrockFixed(Fitness):
 
     def checkTerminate(self, p) -> bool:
         # if the population is all 1,1 IE the fit of each individual is 0
-        return 0 == min(i.fit for i in p.pop)
+        return 0 == min(i.fit for i in p.population)
 
 
 """ DISREGARD. Gave a high a high precision binary floating representation a try
@@ -296,4 +296,4 @@ class RosenbrockIEEE(Fitness):
         return abs((a-x)**2 + b*(y-x**2)**2)
 
     def checkTerminate(self, p) -> bool:
-        return 0 == min(i.fit for i in p.pop)
+        return 0 == min(i.fit for i in p.population)

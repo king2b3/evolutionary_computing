@@ -15,14 +15,16 @@ from ec.individual.individual import FloatingPoint
 from ec.individual.individual import BitString
 from ec.engine.population import Population
 
+from ec.fitness import Fitness
+
 
 class MewLambda(Population):
     ''' Supports Mew Lambda populations for Task 1 with Floating Point individuals
     '''
     def __init__(self, pop_size=100, mew=15, n=4) -> None:
-        self.pop_size = pop_size
+        self.population_size = pop_size
         self.mew = mew
-        self.pop = []
+        self.population = []
         self.parents = []
         self.n = n
         self.generate()
@@ -39,8 +41,8 @@ class MewLambda(Population):
         self.best_performance.append(self.getMinInd())
         max_dist = 0
         # dumb but easy way to find max euclidean distance between two points in the population
-        for ind1 in self.pop:
-            for ind2 in self.pop:
+        for ind1 in self.population:
+            for ind2 in self.population:
                 dist = ((ind1.x - ind2.x)**2 + (ind1.y - ind2.y)**2)**.5
                 if dist > max_dist:
                     max_dist = dist
@@ -56,8 +58,8 @@ class MewLambda(Population):
     def generate(self) -> None:
         """creates individuals. Adds instances of the individuals to a list
         """
-        for _ in range(self.pop_size):
-            self.pop.append(FloatingPoint(self.n))
+        for _ in range(self.population_size):
+            self.population.append(FloatingPoint(self.n))
         
     def getNumSame(self) -> float:
         """Create a dictionary where each key is every unique individual in the population
@@ -71,21 +73,21 @@ class MewLambda(Population):
         from collections import defaultdict 
         num_stats = defaultdict(lambda: 0)
         # counts each unique individuals 
-        for ind in self.pop:
+        for ind in self.population:
             num_stats["{:.5f}".format(ind.x + ind.y)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
-        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.population_size
             
-        return count / self.pop_size 
+        return count / self.population_size 
 
 # same as above but for task 3
 class MewLambdaBitString(Population):
     ''' Supports Mew Lambda populations
     '''
     def __init__(self, ind_size=16, pop_size=100, mew=15) -> None:
-        self.pop_size = pop_size
+        self.population_size = pop_size
         self.mew = mew
-        self.pop = []
+        self.population = []
         self.parents = []
         self.ind_size = ind_size
         self.generate()
@@ -100,8 +102,8 @@ class MewLambdaBitString(Population):
         self.best_performance.append(self.getMinInd())
         max_dist = 0
         # dumb but easy way to find max euclidean distance between two points in the population
-        for ind1 in self.pop:
-            for ind2 in self.pop:
+        for ind1 in self.population:
+            for ind2 in self.population:
                 dist = ((ind1.x - ind2.x)**2 + (ind1.y - ind2.y)**2)**.5
                 if dist > max_dist:
                     max_dist = dist
@@ -116,8 +118,8 @@ class MewLambdaBitString(Population):
 
     def generate(self) -> None:
         # creates pop_size individuals. Adds instances of the individuals to a list
-        for _ in range(self.pop_size):
-            self.pop.append(BitString(self.ind_size))
+        for _ in range(self.population_size):
+            self.population.append(BitString(self.ind_size))
         
     def getNumSame(self) -> float:
         """Create a dictionary where each key is every unique individual in the population
@@ -131,30 +133,20 @@ class MewLambdaBitString(Population):
         from collections import defaultdict 
         num_stats = defaultdict(lambda: 0)
         # counts each unique individuals 
-        for ind in self.pop:
-            num_stats[str(ind.val)] += 1
+        for ind in self.population:
+            num_stats[str(ind.fitness)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
-        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.population_size
             
-        return count / self.pop_size 
+        return count / self.population_size 
 
 
 class FixedSize(Population):
     ''' Canonical Genetic Algorithm
     '''
-    def __init__(self, pop_size, n) -> None:
-        self.pop_size = pop_size
-        self.pop = []
-        self.ind_size = 7*n
-        self.n = n
-        self.generate()
-        
-
-    def generate(self) -> None:
-        """creates pop_size individuals. Adds instances of the individuals to a list
-        """
-        for _ in range(self.pop_size):
-            self.pop.append(BitString(self.ind_size,self.n))
+    def __init__(self, pop_size) -> None:
+        self.population_size = pop_size
+        self.population = []
         
     def getNumSame(self) -> float:
         """Create a dictionary where each key is every unique individual in the population
@@ -168,8 +160,11 @@ class FixedSize(Population):
         from collections import defaultdict 
         num_stats = defaultdict(lambda: 0)
         # counts each unique individuals 
-        for ind in self.pop:
+        for ind in self.population:
             num_stats[str(ind.val)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that by the pop size to get % of unique individuals
-        return 100*sum(filter(lambda i: i > 1, num_stats.values())) / self.pop_size
+        return len(num_stats.values())/ self.population_size * 100
 
+    def calculate_fitness(self, fitness : Fitness):
+        for indv in self.population:
+            indv.fitness = fitness.return_fitness(indv)
