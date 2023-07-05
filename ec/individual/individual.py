@@ -1,9 +1,9 @@
-''' Holds the individual structure.
+""" Holds the individual structure.
 
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 
 import random
 from numpy import random as npr
@@ -72,9 +72,9 @@ class FloatingPoint(Individual):
 
 
 class BitString(Individual):
-    ''' Bitstring representation genotype
+    """ Bitstring representation genotype
           EX/ [1,0,1,1,1]
-    '''
+    """
     def __init__(self, size, mut_rate, val=None) -> None:
         self.size = size
         self.mut_rate = mut_rate
@@ -86,10 +86,12 @@ class BitString(Individual):
             self.generate()
 
     def generate(self) -> None:
+        #TODO add docstring
         # sets value as a random list of 0s and 1s to the self.size
         self.val = random.choices([0,1],k=self.size)
     
     def mutate(self) -> None:
+        #TODO add docstring
         # bitwise mutation rate
         for location in range(self.size):
             r = random.random()
@@ -98,6 +100,7 @@ class BitString(Individual):
                 self.val[location] = 1 - self.val[location]
 
     def crossover(self, ind2) -> list:
+        #TODO add docstring
         # picks random location in the bit string
         loc = random.randint(1,self.size-2)
         # creates temps of the two individuals

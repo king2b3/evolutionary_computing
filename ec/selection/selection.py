@@ -1,9 +1,9 @@
-''' Holds the selection structure.
+""" Holds the selection structure.
 
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 import random
 random.seed()
 from ec.engine.selection import Selection
@@ -26,7 +26,7 @@ class UniformRandom(Selection):
         return new_pop
 
 class RouletteWheelSelection(Selection):
-    ''' Roulette Wheel Selection Function
+    """ Roulette Wheel Selection Function
 
         The population is sorted based off of their fitness
         Each individual calculates their fitness proportional selection rate
@@ -40,7 +40,7 @@ class RouletteWheelSelection(Selection):
           A      1         .1         [0., .1)
           B      4         .4         [.1, .5)
           C      5         .5         [.5, 1.]
-    '''
+    """
 
     def __init__(self, selection_size):
         """Creation of the Roulette Wheel selection function
@@ -72,27 +72,26 @@ class RouletteWheelSelection(Selection):
         return parent_pop
 
 class Tournament(Selection):
-    ''' Tournament selection type. K individuals are selected, and face off in a 
+    """ Tournament selection type. K individuals are selected, and face off in a 
           tournament where the best individual is then passed onto the parent 
           population. 
-
         The K value can be changed to allow for larger tournaments.
 
         The tournament is just selecting which individual has the highest overall 
           fitness, there isn't a direct head-to-head bracket style match up that 
           one would associate with a competitive tournament.
-    '''
+    """
     def __call__(self, population, k=2) -> list:
         parent_pop = []
         while len(parent_pop) < population.population_size:
             tournament = random.choices(population.population,k=4)
             parent_pop.append(max(tournament, key=lambda i: i.fitness))
         return parent_pop
-    
+
 class Random(Selection):
-    ''' Returns a parent population all selected randomly with replacement from 
+    """ Returns a parent population all selected randomly with replacement from 
           the current population
-    '''
+    """
     def __call__(self, population) -> list:
         parent_pop = []
         while len(parent_pop) < population.population_size:

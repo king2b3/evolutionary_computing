@@ -1,4 +1,4 @@
-''' Holds the population structure.
+""" Holds the population structure.
 
     This one needs some more cleaning up for sure.
       Not sure if population class should be abstract or not, still thinking about it.
@@ -6,7 +6,7 @@
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 import random
 random.seed()
 
@@ -19,8 +19,8 @@ from ec.fitness import Fitness
 
 
 class MewLambda(Population):
-    ''' Supports Mew Lambda populations for Task 1 with Floating Point individuals
-    '''
+    """ Supports Mew Lambda populations for Task 1 with Floating Point individuals
+    """
     def __init__(self, pop_size=100, mew=15, n=4) -> None:
         self.population_size = pop_size
         self.mew = mew
@@ -82,8 +82,8 @@ class MewLambda(Population):
 
 # same as above but for task 3
 class MewLambdaBitString(Population):
-    ''' Supports Mew Lambda populations
-    '''
+    """ Supports Mew Lambda populations
+    """
     def __init__(self, ind_size=16, pop_size=100, mew=15) -> None:
         self.population_size = pop_size
         self.mew = mew
@@ -98,6 +98,7 @@ class MewLambdaBitString(Population):
         self.euclidean = []
 
     def getPlotStats(self):
+        #TODO add docstring
         self.average_performance.append(self.getAverageInd())
         self.best_performance.append(self.getMinInd())
         max_dist = 0
@@ -117,6 +118,7 @@ class MewLambdaBitString(Population):
                 f"{self.getNumSame():.4f}"
 
     def generate(self) -> None:
+        #TODO add docstring
         # creates pop_size individuals. Adds instances of the individuals to a list
         for _ in range(self.population_size):
             self.population.append(BitString(self.ind_size))
@@ -142,8 +144,8 @@ class MewLambdaBitString(Population):
 
 
 class FixedSize(Population):
-    ''' Canonical Genetic Algorithm
-    '''
+    """ Canonical Genetic Algorithm
+    """
     def __init__(self, pop_size) -> None:
         self.population_size = pop_size
         self.population = []
@@ -166,5 +168,6 @@ class FixedSize(Population):
         return len(num_stats.values())/ self.population_size * 100
 
     def calculate_fitness(self, fitness : Fitness):
+        #TODO add docstring
         for indv in self.population:
             indv.fitness = fitness.return_fitness(indv)
