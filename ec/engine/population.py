@@ -1,4 +1,4 @@
-''' Holds the base population structure.
+""" Holds the base population structure.
 
     This one needs some more cleaning up for sure.
       Not sure if population class should be abstract or not, still thinking about it.
@@ -6,7 +6,7 @@
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 import abc
 
 class Population(abc.ABC):
