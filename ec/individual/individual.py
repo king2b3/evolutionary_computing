@@ -72,9 +72,9 @@ class FloatingPoint(Individual):
 
 
 class BitString(Individual):
-    ''' Bitstring representation genotype
+    """ Bitstring representation genotype
           EX/ [1,0,1,1,1]
-    '''
+    """
     def __init__(self, size, mut_rate, val=None) -> None:
         self.size = size
         self.mut_rate = mut_rate
