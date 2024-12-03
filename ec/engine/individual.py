@@ -8,37 +8,30 @@
 import abc
 
 class Individual(abc.ABC):
-    """Abstract structure for an individuals in a population."""
-    def __init__(self):
+    """ Abstract structure for an individual.
+          Initializes their fitness to 0.
+    """
+    def __init__(self) -> None:
         self.fit = 0
         self.fit_score = 0
 
     @abc.abstractmethod
-    def generate(self):
-        """Generates a new random individual"""
+    def generate(self) -> None:
+        """Method to generate a random individual"""
 
     @abc.abstractmethod
-    def mutate(self, mut_rate):
-        """Mutatea the individual
+    def mutate(self, mut_rate) -> float:
+        """Method to mutate the individual"""
 
-        Parameters:
-            mut_rate (float): mutation rate
+    @abc.abstractmethod
+    def crossover(self, ind2) -> list:
+        """Method to crossover the individual with another individual single
+        point crossover.
+
+        Might make mutate and crossover into their own child classes of
+        individual later.
         """
 
     @abc.abstractmethod
-    def crossover(self, ind2):
-        """Method to crossover the individual with another individual single point crossover.
-
-        Parameters:
-            individual_2 (Individual): the 2nd individual used for crossover
-
-        Returns:
-            list(Individuals): both the children from the crossover operation
-        """
-
-    @abc.abstractmethod
-    def __str__(self):
-        """For visual representation when the instance is printed
-
-        Returns:
-            Some representation for visualization"""
+    def __str__(self) -> str:
+        """For visual representation when the instance is printed."""

@@ -1,5 +1,8 @@
-""" Holds the base population structure in an abstract class
+""" Holds the base population structure.
 
+    This one needs some more cleaning up for sure.
+      Not sure if population class should be abstract or not, still thinking
+      about it.
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
@@ -7,7 +10,7 @@
 import abc
 
 class Population(abc.ABC):
-    """Abstract class for populations
+    """Base abstract class to create a population of individuals
 
     Args:
         population_size (int): Size of the full population
@@ -16,7 +19,7 @@ class Population(abc.ABC):
         self.population = None
         self.population_size = population_size
 
-    def get_max_ind(self):
+    def get_max_ind(self) -> float:
         """Returns the max fitness in the current population
 
         Returns:
@@ -24,7 +27,7 @@ class Population(abc.ABC):
         """
         return max(self.population, key=lambda i: i.fitness).fitness
 
-    def get_min_ind(self):
+    def get_min_ind(self) -> float:
         """Returns the max fitness in the current population
 
         Returns:
@@ -32,7 +35,8 @@ class Population(abc.ABC):
         """
         return min(self.population, key=lambda i: i.fitness).fitness
 
-    def get_average_ind(self):
+
+    def get_average_ind(self) -> float:
         """Returns the average fitness of hte population
 
         Returns:
@@ -41,7 +45,7 @@ class Population(abc.ABC):
         return sum(i.fitness for i in self.population) / self.population_size
 
     @abc.abstractmethod
-    def get_num_same(self):
+    def get_num_same(self) -> float:
         """Returns the number of unique individuals in the population
 
         Returns:
