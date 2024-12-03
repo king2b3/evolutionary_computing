@@ -3,6 +3,7 @@
    Created on: 1-27-2021
    Version: Python 3.8.5
    Created by: Bayley King (https://github.com/king2b3)
+
 """
 import random
 random.seed()
@@ -35,12 +36,12 @@ class RouletteWheelSelection(Selection):
 
        A "wheel" is created where each individual has a chance of selection based 
        off of their sorted fitness score.
-
-       EX.
-       Ind     Fit     Fit_Score   Wheel Range
-         A      1         .1         [0., .1)
-         B      4         .4         [.1, .5)
-         C      5         .5         [.5, 1.]
+        
+        EX.
+        Ind     Fit     Fit_Score   Wheel Range
+          A      1         .1         [0., .1)
+          B      4         .4         [.1, .5)
+          C      5         .5         [.5, 1.]
     """
     def __init__(self, selection_size):
         """Creation of the Roulette Wheel selection function"""
@@ -72,6 +73,7 @@ class RouletteWheelSelection(Selection):
             parent_pop.append(p.population[i])
         return parent_pop
 
+
 class Tournament(Selection):
     """Tournament selection type. K individuals are selected, and face off in a
          tournament where the best individual is then passed onto the parent
@@ -82,6 +84,7 @@ class Tournament(Selection):
     The tournament is just selecting which individual has the highest overall
         fitness, there isn't a direct head-to-head bracket style match up that
         one would associate with a competitive tournament.
+
     """
     def __call__(self, population, k=2) -> list:
         parent_pop = []

@@ -3,6 +3,7 @@
    Created on: 1-27-2021
    Version: Python 3.8.5
    Created by: Bayley King (https://github.com/king2b3)
+
 """
 
 import random
@@ -95,6 +96,7 @@ class BitString(Individual):
 
     def mutate(self) -> None:
         """Mutates function"""
+
         # bitwise mutation rate
         for location in range(self.size):
             r = random.random()
@@ -104,6 +106,7 @@ class BitString(Individual):
 
     def crossover(self, ind2) -> list:
         """Simple individual 1 point crossover"""
+
         # picks random location in the bit string
         loc = random.randint(1,self.size-2)
         # creates temps of the two individuals

@@ -1,3 +1,4 @@
+
 """Holds the population structure.
 
    This one needs some more cleaning up for sure.
@@ -8,6 +9,7 @@
    Created by: Bayley King (https://github.com/king2b3)
 """
 from collections import defaultdict
+
 import random
 random.seed()
 
