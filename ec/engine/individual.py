@@ -35,4 +35,3 @@ class Individual(abc.ABC):
     @abc.abstractmethod
     def __str__(self) -> str:
         """For visual representation when the instance is printed."""
-

@@ -40,10 +40,8 @@ class Population(abc.ABC):
         """
 
     def pop_stats(self) -> list:
-        """Prints out the stats of a population
-        """
-        return f"Max fitness: {self.getMaxInd():.4f}", \
-               f"Average fitness: {self.getAverageInd():.4f}", \
-               f"Minnimum Fitness: {self.getMinInd():.4f}", \
-               f"Percent Unique: {self.getNumSame():.2f}%"
-
+        """Prints out the stats of a population"""
+        return f"Max fitness: {self.get_max_ind():.4f}", \
+               f"Average fitness: {self.get_average_ind():.4f}", \
+               f"Minnimum Fitness: {self.get_min_ind():.4f}", \
+               f"Percent Unique: {self.get_num_same():.2f}%"

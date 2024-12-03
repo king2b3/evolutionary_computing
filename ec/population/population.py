@@ -7,16 +7,15 @@
    Version: Python 3.8.5
    Created by: Bayley King (https://github.com/king2b3)
 """
+from collections import defaultdict
 import random
 random.seed()
-
 
 from ec.individual.individual import FloatingPoint
 from ec.individual.individual import BitString
 from ec.engine.population import Population
 
 from ec.fitness import Fitness
-
 
 class MewLambda(Population):
     """Supports Mew Lambda populations for Task 1 with Floating Point
@@ -50,9 +49,9 @@ class MewLambda(Population):
 
     def pop_stats(self) -> list:
         """Prints out the stats of a population"""
-        return f"{self.getMinInd():.4f}", \
-                f"{self.getAverageInd():.4f}", \
-                f"{self.getNumSame():.4f}"
+        return f"{self.get_min_ind():.4f}", \
+                f"{self.get_average_ind():.4f}", \
+                f"{self.get_num_same():.4f}"
 
     def generate(self) -> None:
         """creates individuals. Adds instances of the individuals to a list"""
@@ -71,7 +70,7 @@ class MewLambda(Population):
         # allows a default key in the dictionary with a default value of 0.
         from collections import defaultdict
         num_stats = defaultdict(lambda: 0)
-        # counts each unique individuals 
+        # counts each unique individuals
         for ind in self.population:
             num_stats["{:.5f}".format(ind.x + ind.y)] += 1
         # Sum the count of individuals whose count is higher than 1.
@@ -96,6 +95,7 @@ class MewLambdaBitString(Population):
         self.euclidean = []
 
     def get_plot_stats(self):
+        """Get the stats to plot the distance between members"""
         self.average_performance.append(self.getAverageInd())
         self.best_performance.append(self.getMinInd())
         max_dist = 0
@@ -110,9 +110,9 @@ class MewLambdaBitString(Population):
 
     def pop_stats(self) -> list:
         """Prints out the stats of a population"""
-        return f"{self.getMinInd():.4f}", \
-                f"{self.getAverageInd():.4f}", \
-                f"{self.getNumSame():.4f}"
+        return f"{self.get_min_ind():.4f}", \
+                f"{self.get_average_ind():.4f}", \
+                f"{self.get_num_same():.4f}"
 
     def generate(self) -> None:
         """Creates the population"""
@@ -131,18 +131,15 @@ class MewLambdaBitString(Population):
         Returns
             % unique individuals in the population
         """
-        # allows a default key in the dictionary with a default value of 0. 
-        from collections import defaultdict
+        # allows a default key in the dictionary with a default value of 0.
         num_stats = defaultdict(lambda: 0)
-        # counts each unique individuals 
+        # counts each unique individuals
         for ind in self.population:
             num_stats[str(ind.fitness)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide
         # that by the pop size to get % of unique individuals
         return 100*sum(filter(lambda i: i > 1, num_stats.values())) \
                 / self.population_size
-
-        return count / self.population_size
 
 
 class FixedSize(Population):
@@ -161,10 +158,9 @@ class FixedSize(Population):
         Returns
             % unique individuals in the population
         """
-        # allows a default key in the dictionary with a default value of 0. 
-        from collections import defaultdict
+        # allows a default key in the dictionary with a default value of 0.
         num_stats = defaultdict(lambda: 0)
-        # counts each unique individuals 
+        # counts each unique individuals
         for ind in self.population:
             num_stats[str(ind.val)] += 1
         # Sum the count of individuals whose count is higher than 1. Divide that
@@ -175,4 +171,3 @@ class FixedSize(Population):
         """Calculates the fitness of the entire population"""
         for indv in self.population:
             indv.fitness = fitness.return_fitness(indv)
-
