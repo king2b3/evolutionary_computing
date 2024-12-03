@@ -1,11 +1,12 @@
-''' Holds the fitness structure.
+""" Holds the fitness structure.
 
-    Later I want to modify this to take in the population and/or individual object, but not needed yet
+    Later I want to modify this to take in the population and/or individual
+    object, but not needed yet.
 
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 import abc
 import math
 
@@ -14,25 +15,22 @@ class Fitness(abc.ABC):
         ''' Abstract class that contains a fitness function
         '''
         self.fit_count = 0
-    
+
     @abc.abstractmethod
     def check_terminate(self, pop) -> bool:
-        ''' Returns True if the termination conditions are met
-        '''
-        pass
+        """Returns True if the termination conditions are met"""
 
 
 class RosenbrockNDim(Fitness):
-    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
+    """𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
 
         First half of the individual is x, second half is y.
-        
+
         For an individual sized N, a fixed point splits is like this
           X = S(N/4,N/4)
-    '''
+    """
     def translate(self, n, split=0) -> float:
-        ''' Returns the float value from IEEE 745
-        '''
+        """Returns the float value from IEEE 745"""
         if split != 0:
             pass
         else:
@@ -50,7 +48,7 @@ class RosenbrockNDim(Fitness):
 
         # combines the left hand side into an int
         left = int(bin(int(''.join(map(str, left)), 2)), 2)
-        
+
         # adds the right hand floating value to the left side
         new_right = 0
         temp = 0.5
@@ -60,7 +58,9 @@ class RosenbrockNDim(Fitness):
             temp = temp / 2
         return (sign) * (left + new_right)
 
-    def returnFitnessSGA(self, ind) -> float:
+    def return_fitness_SGA(self, ind) -> float:
+        """Returns the fitness, assuming each individual is two
+        separate values"""
         # splits the individual into multiple variables
         sum_fit = 0
         for x in range(0,len(ind.val)-7,7):
@@ -74,12 +74,14 @@ class RosenbrockNDim(Fitness):
                 x_1 = 5.11
             elif x_1 < -5.12:
                 x_1 = -5.12
-            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2            
+            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2
         # returns the rosenbrock value of the two variables
         self.fit_count += 1
         return sum_fit
 
-    def returnFitnessES(self, ind) -> float:
+    def return_fitness_ES(self, ind) -> float:
+        """Returns the fitness, by pulling from an individual with
+        attributes for each variable"""
         sum_fit = 0
         for x in range(len(ind.val[:-1])):
             x_1 = ind.val[x+1]
@@ -92,7 +94,7 @@ class RosenbrockNDim(Fitness):
                 x_1 = 5.11
             elif x_1 < -5.12:
                 x_1 = -5.12
-            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2 
+            sum_fit += 100*(x_1 - x_i**2)**2 + (x_i - 1)**2
         # return summed fitness
         self.fit_count += 1
         return sum_fit
@@ -100,25 +102,22 @@ class RosenbrockNDim(Fitness):
     def check_terminate(self, p) -> bool:
         # if the population is all 1,1 IE the fit of each individual is 0
         return 0 == min(i.fit for i in p.population)
-    
-    def check_terminateNDim(self, p) -> bool:
+
+    def check_terminate_NDim(self, p) -> bool:
         for i in p.population:
             if i.fit == 0:
                 return True
         return False
 
 
-
-# task 1
 class Himmelblau(Fitness):
-    def returnFitness(self, ind) -> float:
-        '''Returns the fitness of an individual
-        '''
+    """Fitness function for the Himmelblau optimization function"""
+    def return_fitness(self, ind) -> float:
+        """Returns the fitness of an individual"""
         return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
-    
+
     def check_terminate(self, p) -> bool:
-        '''Returns True if the termination conditions are met
-        '''
+        """Returns True if the termination conditions are met"""
         count = 0
         for ind in p.population:
             self.fit_count += 1
@@ -127,11 +126,10 @@ class Himmelblau(Fitness):
         return count == p.population_size
 
 
-# the task 3 implementation which needs to convert he bit string into floats for the calculations
 class HimmelblauTask3(Fitness):
+    """Another Himmelblau optimization function"""
     def translate(self, n, split=0) -> float:
-        ''' Returns the float value from IEEE 745
-        '''
+        """Returns the float value from IEEE 745"""
         if split != 0:
             pass
         else:
@@ -149,7 +147,7 @@ class HimmelblauTask3(Fitness):
 
         # combines the left hand side into an int
         left = int(bin(int(''.join(map(str, left)), 2)), 2)
-        
+
         # adds the right hand floating value to the left side
         new_right = 0
         temp = 0.5
@@ -157,11 +155,10 @@ class HimmelblauTask3(Fitness):
             if m:
                 new_right += temp
             temp = temp / 2
-        return (sign) * (left + new_right)   
+        return (sign) * (left + new_right)
 
     def return_fitness(self, ind) -> float:
-        ''' Returns the fitness of an individual
-        '''
+        """Returns the fitness of an individual"""
         x = self.translate(ind.val[:int(ind.size/ind.num_of_variables)])
         y = self.translate(ind.val[int(ind.size/ind.num_of_variables):])
         # just used for plotting stats
@@ -170,10 +167,9 @@ class HimmelblauTask3(Fitness):
         # increment number of fitness calcs 
         self.fit_count += 1
         return ((x**2 + y - 11)**2 + (x + y**2 -7)**2)
-    
+
     def check_terminate(self, p) -> bool:
-        ''' Returns True if the termination conditions are met
-        '''
+        """Returns True if the termination conditions are met"""
         count = 0
         for ind in p.population:
             self.fit_count += 1
@@ -183,21 +179,21 @@ class HimmelblauTask3(Fitness):
 
 
 class MaxOnes(Fitness):
-    ''' Goal is to have the genotype be all 1s
-    '''
+    """Goal is to have the genotype be all 1s"""
     def return_fitness(self, ind) -> float:
-        ''' Sums the individual since its just a list of 0s and 1s. 
+        ''' Sums the individual since its just a list of 0s and 1s.
               Divides by the length of the individual.
         '''
         # sums the list, [1,1,1,1,0,0] would have sum 4 
         return sum(ind.val)/ind.size
 
     def check_terminate(self, p) -> bool:
-        ''' Creates a list of [1,1,1,...1] the size of the desired individual
-              I should pass in the full population class so it can call the length, but here we are
-            Sizes based off of first entry in the population, since all individuals are the same size
-            If the number of individuals that are all [1,1,1...1] = the length of the pop, the we can exit
-        '''
+        """Creates a list of [1,1,1,...1] the size of the desired individual
+
+        I should pass in the full population class so it can call the length, but here we are
+        Sizes based off of first entry in the population, since all individuals are the same size
+        If the number of individuals that are all [1,1,1...1] = the length of the pop, the we can exit
+        """
         count = 0
         for ind in p.population:
             # [1]*4 would result in [1,1,1,1]
@@ -208,16 +204,15 @@ class MaxOnes(Fitness):
 
 
 class RosenbrockFixed(Fitness):
-    ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
+    """𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
 
         First half of the individual is x, second half is y.
-        
+
         For an individual sized N, a fixed point splits is like this
           X = S(N/4,N/4)
-    '''
+    """
     def translate(self, n, split=0) -> float:
-        ''' Returns the float value from IEEE 745
-        '''
+        """Returns the float value from IEEE 745"""
         if split != 0:
             pass
         else:
@@ -235,7 +230,7 @@ class RosenbrockFixed(Fitness):
 
         # combines the left hand side into an int
         left = int(bin(int(''.join(map(str, left)), 2)), 2)
-        
+
         # adds the right hand floating value to the left side
         new_right = 0
         temp = 0.5
@@ -245,14 +240,16 @@ class RosenbrockFixed(Fitness):
             temp = temp / 2
         return (sign) * (left + new_right)
 
-    def returnFitness(self, individual, a=1, b=100) -> float:
+    def return_fitness(self, individual, a=1, b=100) -> float:
+        """Returns the fitness for multiple variations"""
         # splits the individual into multiple variables
         x = self.translate(individual.val[:individual.num_of_variables])
         y = self.translate(individual.val[individual.num_of_variables:])
         # returns the rosenbrock value of the two variables
         return abs((a-x)**2 + b*(y-x**2)**2)
 
-    def checkTerminate(self, p) -> bool:
+    def check_terminate(self, p) -> bool:
+        """Checks for the termination condition"""
         # if the population is all 1,1 IE the fit of each individual is 0
         return 0 == min(i.fit for i in p.population)
 
@@ -262,7 +259,6 @@ class RosenbrockFixed(Fitness):
       this problem scope.
 
       Leaving the code here as a reference
-"""
 
 class RosenbrockIEEE(Fitness):
     ''' 𝑓(𝑥, 𝑦) = (𝑎 − 𝑥)^2 + 𝑏(𝑦 − 𝑥^2) where 𝑎 = 1 and 𝑏 = 100
@@ -297,3 +293,5 @@ class RosenbrockIEEE(Fitness):
 
     def checkTerminate(self, p) -> bool:
         return 0 == min(i.fit for i in p.population)
+"""
+
