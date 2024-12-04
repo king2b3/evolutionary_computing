@@ -1,8 +1,9 @@
 """ Holds the base population structure.
 
     This one needs some more cleaning up for sure.
-      Not sure if population class should be abstract or not, still thinking
-      about it.
+    Not sure if population class should be abstract or not, still thinking
+    about it.
+
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
@@ -35,9 +36,8 @@ class Population(abc.ABC):
         """
         return min(self.population, key=lambda i: i.fitness).fitness
 
-
     def get_average_ind(self) -> float:
-        """Returns the average fitness of hte population
+        """Returns the average fitness of the population
 
         Returns:
             float: the mean fitness in the population

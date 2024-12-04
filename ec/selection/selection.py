@@ -3,7 +3,6 @@
    Created on: 1-27-2021
    Version: Python 3.8.5
    Created by: Bayley King (https://github.com/king2b3)
-
 """
 import random
 random.seed()
@@ -71,6 +70,7 @@ class RouletteWheelSelection(Selection):
             while r >= p.population[i].fit_score:
                 i += 1
             parent_pop.append(p.population[i])
+        
         return parent_pop
 
 
@@ -84,7 +84,6 @@ class Tournament(Selection):
     The tournament is just selecting which individual has the highest overall
         fitness, there isn't a direct head-to-head bracket style match up that
         one would associate with a competitive tournament.
-
     """
     def __call__(self, population, k=2) -> list:
         parent_pop = []
