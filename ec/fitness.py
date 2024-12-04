@@ -186,7 +186,7 @@ class MaxOnes(Fitness):
         # sums the list, [1,1,1,1,0,0] would have sum 4
         return sum(ind.val)/ind.size
 
-      def check_terminate(self, pop) -> bool:
+    def check_terminate(self, pop) -> bool:
         """Creates a list of [1,1,1,...1] the size of the desired individual
 
         I should pass in the full population class so it can call the length,

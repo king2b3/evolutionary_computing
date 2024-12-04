@@ -16,3 +16,4 @@ class Selection(abc.ABC):
     @abc.abstractmethod
     def __call__(self, pop) -> list:
         """Returns the parent population"""
+

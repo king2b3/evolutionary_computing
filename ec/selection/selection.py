@@ -33,9 +33,9 @@ class RouletteWheelSelection(Selection):
        Each individual calculates their fitness proportional selection rate
          IE. Individual fitness / sum of fitnesses from the population
 
-       A "wheel" is created where each individual has a chance of selection based 
-       off of their sorted fitness score.
-        
+       A "wheel" is created where each individual has a chance of selection
+       based off of their sorted fitness score.
+
         EX.
         Ind     Fit     Fit_Score   Wheel Range
           A      1         .1         [0., .1)
@@ -70,7 +70,7 @@ class RouletteWheelSelection(Selection):
             while r >= p.population[i].fit_score:
                 i += 1
             parent_pop.append(p.population[i])
-        
+
         return parent_pop
 
 

@@ -45,7 +45,7 @@ class FloatingPoint(Individual):
             r = random.random()
             if r <= mut_rate:
                 val = npr.normal(val,dev)
-        self.checkRange()
+        self.check_range()
 
     def crossover(self, ind2) -> None:
         """Performs an intermediate recombination of two individuals
@@ -115,4 +115,3 @@ class BitString(Individual):
 
     def __str__(self) -> str:
         return str(self.val)
-

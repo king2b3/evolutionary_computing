@@ -14,7 +14,6 @@ random.seed()
 from ec.individual.individual import FloatingPoint
 from ec.individual.individual import BitString
 from ec.engine.population import Population
-
 from ec.fitness import Fitness
 
 class MewLambda(Population):
@@ -35,8 +34,8 @@ class MewLambda(Population):
 
     def get_plot_stats(self):
         """Saves the current stats that will be plotted at the end of the EA"""
-        self.average_performance.append(self.getAverageInd())
-        self.best_performance.append(self.getMinInd())
+        self.average_performance.append(self.get_average_ind())
+        self.best_performance.append(self.get_min_ind())
         max_dist = 0
         # dumb but easy way to find max euclidean distance between two points
         # in the population
@@ -58,7 +57,7 @@ class MewLambda(Population):
         for _ in range(self.population_size):
             self.population.append(FloatingPoint(self.n))
 
-    def getNumSame(self) -> float:
+    def get_num_same(self) -> float:
         """Create a dictionary where each key is every unique individual in the
         population.
         The number of each individuals are counted.
@@ -68,7 +67,6 @@ class MewLambda(Population):
             % unique individuals in the population
         """
         # allows a default key in the dictionary with a default value of 0.
-        from collections import defaultdict
         num_stats = defaultdict(lambda: 0)
         # counts each unique individuals
         for ind in self.population:
@@ -96,8 +94,8 @@ class MewLambdaBitString(Population):
 
     def get_plot_stats(self):
         """Get the stats to plot the distance between members"""
-        self.average_performance.append(self.getAverageInd())
-        self.best_performance.append(self.getMinInd())
+        self.average_performance.append(self.get_average_ind())
+        self.best_performance.append(self.get_min_ind())
         max_dist = 0
         # dumb but easy way to find max euclidean distance between two points
         # in the population
