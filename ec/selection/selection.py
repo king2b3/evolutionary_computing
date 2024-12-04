@@ -35,41 +35,44 @@ class RouletteWheelSelection(Selection):
 
        A "wheel" is created where each individual has a chance of selection based 
        off of their sorted fitness score.
-
-       EX.
-       Ind     Fit     Fit_Score   Wheel Range
-         A      1         .1         [0., .1)
-         B      4         .4         [.1, .5)
-         C      5         .5         [.5, 1.]
+        
+        EX.
+        Ind     Fit     Fit_Score   Wheel Range
+          A      1         .1         [0., .1)
+          B      4         .4         [.1, .5)
+          C      5         .5         [.5, 1.]
     """
-
     def __init__(self, selection_size):
         """Creation of the Roulette Wheel selection function"""
         super().__init__(selection_size)
 
     def __call__(self, p) -> list:
         s = sum(i.fitness for i in p.population)
-        p.population = sorted((ind for ind in p.population), key=lambda ind: ind.fitness)
+        p.population = sorted((ind for ind in p.population), key=lambda \
+                ind: ind.fitness)
         if s == 0:
             # case when the population is all individuals of all 0s
             # no need to run the function, since they are all the same
             return p.population
-        else:
-            # determines the proportional fitness 
-            for i in range(p.population_size):
-                if i == 0:
-                    p.population[i].fit_score = p.population[i].fitness / s
-                else:
-                    p.population[i].fit_score = p.population[i-1].fit_score + (p.population[i].fitness / s)
-            parent_pop = []
-            # runs the roulette wheel
-            for n in range(self.sel_size):
-                r = random.random()
-                i = 0
-                while r >= p.population[i].fit_score:
-                    i += 1
-                parent_pop.append(p.population[i])
+
+        # determines the proportional fitness 
+        for i in range(p.population_size):
+            if i == 0:
+                p.population[i].fit_score = p.population[i].fitness / s
+            else:
+                p.population[i].fit_score = p.population[i-1].fit_score + \
+                        (p.population[i].fitness / s)
+        parent_pop = []
+        # runs the roulette wheel
+        for n in range(self.sel_size):
+            r = random.random()
+            i = 0
+            while r >= p.population[i].fit_score:
+                i += 1
+            parent_pop.append(p.population[i])
+        
         return parent_pop
+
 
 class Tournament(Selection):
     """Tournament selection type. K individuals are selected, and face off in a
@@ -99,4 +102,3 @@ class Random(Selection):
         while len(parent_pop) < population.population_size:
             parent_pop.append(random.choice(population.population))
         return parent_pop
-

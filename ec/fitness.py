@@ -12,8 +12,7 @@ import math
 
 class Fitness(abc.ABC):
     def __init__(self) -> None:
-        ''' Abstract class that contains a fitness function
-        '''
+        """Abstract class that contains a fitness function"""
         self.fit_count = 0
 
     @abc.abstractmethod
@@ -58,7 +57,7 @@ class RosenbrockNDim(Fitness):
             temp = temp / 2
         return (sign) * (left + new_right)
 
-    def return_fitness_SGA(self, ind) -> float:
+    def return_fitness_sga(self, ind) -> float:
         """Returns the fitness, assuming each individual is two
         separate values"""
         # splits the individual into multiple variables
@@ -79,7 +78,7 @@ class RosenbrockNDim(Fitness):
         self.fit_count += 1
         return sum_fit
 
-    def return_fitness_ES(self, ind) -> float:
+    def return_fitness_es(self, ind) -> float:
         """Returns the fitness, by pulling from an individual with
         attributes for each variable"""
         sum_fit = 0
@@ -99,12 +98,12 @@ class RosenbrockNDim(Fitness):
         self.fit_count += 1
         return sum_fit
 
-    def check_terminate(self, p) -> bool:
+    def check_terminate(self, pop) -> bool:
         # if the population is all 1,1 IE the fit of each individual is 0
-        return 0 == min(i.fit for i in p.population)
+        return 0 == min(i.fit for i in pop.population)
 
-    def check_terminate_NDim(self, p) -> bool:
-        for i in p.population:
+    def check_terminate_NDim(self, pop) -> bool:
+        for i in pop.population:
             if i.fit == 0:
                 return True
         return False
@@ -114,16 +113,16 @@ class Himmelblau(Fitness):
     """Fitness function for the Himmelblau optimization function"""
     def return_fitness(self, ind) -> float:
         """Returns the fitness of an individual"""
-        return ((ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2)
+        return (ind.x**2 + ind.y - 11)**2 + (ind.x + ind.y**2 -7)**2
 
-    def check_terminate(self, p) -> bool:
+    def check_terminate(self, pop) -> bool:
         """Returns True if the termination conditions are met"""
         count = 0
-        for ind in p.population:
+        for ind in pop.population:
             self.fit_count += 1
             if ind.fit == 0.0:
                 count+=1
-        return count == p.population_size
+        return count == pop.population_size
 
 
 class HimmelblauTask3(Fitness):
@@ -166,16 +165,16 @@ class HimmelblauTask3(Fitness):
         ind.y = y
         # increment number of fitness calcs 
         self.fit_count += 1
-        return ((x**2 + y - 11)**2 + (x + y**2 -7)**2)
+        return (x**2 + y - 11)**2 + (x + y**2 -7)**2
 
-    def check_terminate(self, p) -> bool:
+    def check_terminate(self, pop) -> bool:
         """Returns True if the termination conditions are met"""
         count = 0
-        for ind in p.population:
+        for ind in pop.population:
             self.fit_count += 1
             if ind.fit == 0.0:
                 count+=1
-        return count == p.population_size
+        return count == pop.population_size
 
 
 class MaxOnes(Fitness):
@@ -184,23 +183,26 @@ class MaxOnes(Fitness):
         ''' Sums the individual since its just a list of 0s and 1s.
               Divides by the length of the individual.
         '''
-        # sums the list, [1,1,1,1,0,0] would have sum 4 
+        # sums the list, [1,1,1,1,0,0] would have sum 4
         return sum(ind.val)/ind.size
 
-    def check_terminate(self, p) -> bool:
+      def check_terminate(self, pop) -> bool:
         """Creates a list of [1,1,1,...1] the size of the desired individual
 
-        I should pass in the full population class so it can call the length, but here we are
-        Sizes based off of first entry in the population, since all individuals are the same size
-        If the number of individuals that are all [1,1,1...1] = the length of the pop, the we can exit
+        I should pass in the full population class so it can call the length,
+            but here we are.
+        Sizes based off of first entry in the population, since all individuals
+            are the same size.
+        If the number of individuals that are all [1,1,1...1] = the length of
+            the pop, the we can exit.
         """
         count = 0
-        for ind in p.population:
+        for ind in pop.population:
             # [1]*4 would result in [1,1,1,1]
-            if [1]*p.population[0].size == ind.val:
+            if [1] * pop.population[0].size == ind.val:
                 count += 1
         # if each individual is all 1s
-        return count == p.population_size
+        return count == pop.population_size
 
 
 class RosenbrockFixed(Fitness):
@@ -248,10 +250,10 @@ class RosenbrockFixed(Fitness):
         # returns the rosenbrock value of the two variables
         return abs((a-x)**2 + b*(y-x**2)**2)
 
-    def check_terminate(self, p) -> bool:
+    def check_terminate(self, pop) -> bool:
         """Checks for the termination condition"""
         # if the population is all 1,1 IE the fit of each individual is 0
-        return 0 == min(i.fit for i in p.population)
+        return 0 == min(i.fit for i in pop.population)
 
 
 """ DISREGARD. Gave a high a high precision binary floating representation a try

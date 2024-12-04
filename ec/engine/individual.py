@@ -1,9 +1,9 @@
-''' Abstract class for the individual structure.
+""" Abstract class for the individual structure.
 
     Created on: 1-27-2021
     Version: Python 3.8.5
     Created by: Bayley King (https://github.com/king2b3)
-'''
+"""
 
 import abc
 
@@ -35,4 +35,3 @@ class Individual(abc.ABC):
     @abc.abstractmethod
     def __str__(self) -> str:
         """For visual representation when the instance is printed."""
-

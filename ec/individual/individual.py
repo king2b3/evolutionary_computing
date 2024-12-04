@@ -12,9 +12,10 @@ random.seed()
 from ec.engine.individual import Individual
 
 class FloatingPoint(Individual):
-    def __init__(self, n, max_val=5.11, min_val=-5.12, ox=1, oy=1) -> None:
+    """Floating point class for individuals"""
+    def __init__(self, n, max_val=5.11, min_val=-5.12) -> None:
         super().__init__()
-        # standard deviations 
+        # standard deviations
         self.val = []
         self.o = []
         # x and y values

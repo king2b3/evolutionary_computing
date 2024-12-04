@@ -4,6 +4,7 @@ original author: bking
 """
 import time
 class Timer():
+    """Basic timer utility"""
     def __init__(self):
         """Timer class to track and report time usage to print"""
         self.start_time = 0
@@ -22,4 +23,3 @@ class Timer():
         """Returns the End - Start."""
         self.time = self.end_time - self.start_time
         return 'Run time: {:0.4f}\n'.format(self.time)
-
